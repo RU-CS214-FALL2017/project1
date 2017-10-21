@@ -10,7 +10,6 @@ typedef struct {
     
 } FunFact;
 
-// Prints interesting facts in <table> with <rows> rows and <columns> columns.
 void analize(char *** table, const unsigned int rows, const unsigned int columns);
 
 #endif /* analyser_h */

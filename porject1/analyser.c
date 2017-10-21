@@ -4,21 +4,13 @@
 #include "sorter.h"
 #include "analyser.h"
 
-// Returns the most frequent value in column at <columnIndex> from row at index
-// <start> inclusive to row at index <end> exclusive.
 char * mostFrequentInColumnSegment(char *** table, const unsigned int columnIndex,
                                    const unsigned int start, const unsigned int end);
-
-// Prints an the array <funFacts> with <number> elements, in a logical
-// mannor with <phrase> given as extra information.
 void printFunFacts(FunFact * funFacts, int number, const char * phrase);
-
-// Saves most frequent value in column at index <columnIndex> from row at
-// index <start> to row at index <end> in <funFacts> at index <elements>
-// when <table> is sorted according to the column at index <relativeIndex>
 void saveFunFact(FunFact * funFacts, int * elements, char *** table, const unsigned int columnIndex,
                   const unsigned int relativeIndex, const unsigned int start, const unsigned int end);
 
+// Prints interesting facts in <table> with <rows> rows and <columns> columns.
 void analize(char *** table, const unsigned int rows, const unsigned int columns) {
     
     FunFact top[columns];
@@ -59,6 +51,8 @@ void analize(char *** table, const unsigned int rows, const unsigned int columns
     printf("\n\n");
 }
 
+// Returns the most frequent value in column at <columnIndex> from row at index
+// <start> inclusive to row at index <end> exclusive.
 char * mostFrequentInColumnSegment(char *** table, const unsigned int columnIndex,
                                      const unsigned int start, const unsigned int end) {
     
@@ -85,6 +79,8 @@ char * mostFrequentInColumnSegment(char *** table, const unsigned int columnInde
     return NULL;
 }
 
+// Prints an the array <funFacts> with <number> elements, in a logical
+// mannor with <phrase> given as extra information.
 void printFunFacts(FunFact * funFacts, int number, const char * phrase) {
     
     if (number) {
@@ -103,6 +99,9 @@ void printFunFacts(FunFact * funFacts, int number, const char * phrase) {
     }
 }
 
+// Saves most frequent value in column at index <columnIndex> from row at
+// index <start> to row at index <end> in <funFacts> at index <elements>
+// when <table> is sorted according to the column at index <relativeIndex>
 void saveFunFact(FunFact * funFacts, int * elements, char *** table, const unsigned int columnIndex,
                   const unsigned int relativeIndex, const unsigned int start, const unsigned int end) {
     

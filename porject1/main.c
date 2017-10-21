@@ -5,8 +5,6 @@
 #include "sorter.h"
 #include "analyser.h"
 
-// Frees <table>'s refrence with <rows> rows and
-// <columns> columns from the heap.
 void freeTable(char * *** table, int rows, int columns);
 
 int main(int argc, const char * argv[]) {
@@ -66,6 +64,8 @@ int main(int argc, const char * argv[]) {
     exit(EXIT_SUCCESS);
 }
 
+// Frees <table>'s refrence with <rows> rows and
+// <columns> columns from the heap.
 void freeTable(char * *** table, int rows, int columns) {
     
     for (int i = 0; i < rows; i++) {
