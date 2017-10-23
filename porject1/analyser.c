@@ -14,11 +14,11 @@ void saveFunFact(FunFact * funFacts, int * elements, char *** table, const unsig
 void analize(char *** table, const unsigned int rows, const unsigned int columns) {
     
     FunFact top[columns];
-    char topRelatives[columns][4096];
+    char topRelatives[columns][TEMPSIZE];
     int topElms = 0;
     
     FunFact bottom[columns];
-    char bottomRelatives[columns][4096];
+    char bottomRelatives[columns][TEMPSIZE];
     int bottomElms = 0;
     
     for (int i = 0; i < columns; i++) {

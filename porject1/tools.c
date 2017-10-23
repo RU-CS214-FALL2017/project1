@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <limits.h>
 
 #include "tools.h"
 
@@ -13,7 +15,7 @@ unsigned int tokenizeRow(const char * line, char * ** row) {
     *row = (char **) malloc(strlen(line) * sizeof(char *));
     
     char tempChar = '\0';
-    char tempCell[4096];
+    char tempCell[TEMPSIZE];
     int i = 0; // number of columns
     int j = 0; // number of characters in column field
     int inQuote = 0;
@@ -102,11 +104,11 @@ void removeChars (char * str, unsigned long startIndex, unsigned long endIndex) 
 void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned int * columns) {
     
     *table = (char ***) malloc(4194304 * sizeof(char **));
-    char line[4096];
+    char line[TEMPSIZE];
     *rows = 0;
     *columns = 0;
     
-    while(fgets(line, 4096, csvFile) != NULL) {
+    while(fgets(line, TEMPSIZE, csvFile) != NULL) {
         
         int tempColumns = tokenizeRow(line, &(*table)[*rows]);
         
@@ -194,6 +196,67 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
             return 0;
         }
     }
+    
+    return 1;
+}
+
+// Finds all "propper" .csv files in the path <dirPath> and all subdirectories.
+// <foundCsv> is a pre-allocated array of char * to be filled with paths to all
+// "proper" .csv files found. <numFound>'s refrence will be set to the number
+// of "proper" .csv files found. Returns 1 if the directory at <dirPath> is
+// found, and 0 otherwise.
+int findCSVFiles(const char * dirPath, char ** csvPaths, int * numFound) {
+
+    DIR * dir = opendir(dirPath);
+    
+    if (dir == NULL) {
+        return 0;
+    }
+    
+    int cpp = 0; // Pointer for <csvPaths>.
+    
+    char subDirPaths[255][TEMPSIZE];
+    int sdp = 0; // Pointer for <subdirectories>.
+    
+    char csvPath[TEMPSIZE];
+    
+    for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
+        
+        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
+            
+            sprintf(subDirPaths[sdp], "%s/%s", dirPath, entry->d_name);
+            sdp++;
+            
+        } else if (entry->d_type == DT_REG) {
+            
+            sprintf(csvPath, "%s/%s", dirPath, entry->d_name);
+            
+            if (isProperCsv(csvPath)) {
+                
+                csvPaths[cpp] = (char *) malloc((sizeof(char) * strlen(csvPath)) + 1);
+                strcpy(csvPaths[cpp], csvPath);
+                cpp++;
+            }
+        }
+    }
+    
+    for (int i = 0; i < sdp; i++) {
+        
+        int found = 0;
+        findCSVFiles(subDirPaths[i], &csvPaths[cpp], &found);
+        
+        cpp += found;
+    }
+    
+    *numFound = cpp;
+    return 1;
+}
+
+// --------------
+// | INCOMPLETE |
+// --------------
+// Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
+int isProperCsv(const char * csvPath) {
     
     return 1;
 }
