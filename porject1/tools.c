@@ -6,6 +6,8 @@
 
 #include "tools.h"
 
+int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
+
 // <row> is the address to a char **.
 // Creates a array of strings A, where each comma seperated value
 // from <line> is an element of A, and <row>'s refrence is set to point to A.
@@ -201,24 +203,43 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
 }
 
 // Finds all "propper" .csv files in the path <dirPath> and all subdirectories.
-// <foundCsv> is a pre-allocated array of char * to be filled with paths to all
-// "proper" .csv files found. <numFound>'s refrence will be set to the number
-// of "proper" .csv files found. Returns 1 if the directory at <dirPath> is
-// found, and 0 otherwise.
-int findCSVFiles(const char * dirPath, char ** csvPaths, int * numFound) {
+// <foundCsv>' is a pre-allocated array of char * to be filled with's refrence
+// will point to a newly allocated array of strings with paths to all "proper"
+// .csv files found. <numFound>'s refrence will be set to the number of "proper"
+// .csv files found. Returns 1 if the directory at <dirPath> is found, and 0
+// otherwise.
+int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound) {
 
+    (*csvPaths) = (char **) malloc(sizeof(char *) * TEMPSIZE);
+    (*numFound) = 0;
+    
+    if (findCsvFilesHelper(dirPath, *csvPaths, numFound)) {
+        
+        (*csvPaths) = realloc(*csvPaths, sizeof(char *) * (*numFound));
+        return 1;
+        
+    } else {
+        
+        free(*csvPaths);
+        return 0;
+    }
+}
+
+// This is a recursive helper function. Finds all "propper" .csv files in the
+// path <dirPath> and all subdirectories thorugh recursive calling. <csvPaths>
+// is a pre-allocated array of (char *)'s. <numFound>'s refrence keeps track
+// of the current index of <csvPaths>. Returns 1 if the directory at <dirPath>
+// is found, and 0 otherwise or if any of the recursive calls return a 0.
+int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
+    
     DIR * dir = opendir(dirPath);
     
     if (dir == NULL) {
         return 0;
     }
     
-    int cpp = 0; // Pointer for <csvPaths>.
-    
     char subDirPaths[255][TEMPSIZE];
     int sdp = 0; // Pointer for <subdirectories>.
-    
-    char csvPath[TEMPSIZE];
     
     for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
         
@@ -229,26 +250,32 @@ int findCSVFiles(const char * dirPath, char ** csvPaths, int * numFound) {
             
         } else if (entry->d_type == DT_REG) {
             
+            char csvPath[TEMPSIZE];
             sprintf(csvPath, "%s/%s", dirPath, entry->d_name);
             
             if (isProperCsv(csvPath)) {
                 
-                csvPaths[cpp] = (char *) malloc((sizeof(char) * strlen(csvPath)) + 1);
-                strcpy(csvPaths[cpp], csvPath);
-                cpp++;
+                csvPaths[*numFound] = (char *) malloc((sizeof(char) * strlen(csvPath)) + 1);
+                strcpy(csvPaths[*numFound], csvPath);
+                (*numFound)++;
             }
         }
     }
     
+    closedir(dir);
+    
     for (int i = 0; i < sdp; i++) {
         
-        int found = 0;
-        findCSVFiles(subDirPaths[i], &csvPaths[cpp], &found);
-        
-        cpp += found;
+        if (!findCsvFilesHelper(subDirPaths[i], csvPaths, numFound)) {
+            
+            for (int i = 0; i < (*numFound); i++) {
+                free(csvPaths[*numFound]);
+            }
+            
+            return 0;
+        }
     }
     
-    *numFound = cpp;
     return 1;
 }
 

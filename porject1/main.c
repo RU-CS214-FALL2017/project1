@@ -10,9 +10,9 @@ void freeTable(char * *** table, int rows, int columns);
 
 int main(int argc, const char ** argv) {
     
-    int found = 0;
-    char * paths[TEMPSIZE];
-    findCSVFiles("fun/", paths, &found);
+    int found;
+    char ** paths;
+    findCsvFiles("fun", &paths, &found);
     
     for (int i = 0; i < found; i++) {
         printf("%s\n", paths[i]);

@@ -21,7 +21,7 @@ void printTable (char *** table, unsigned int rows, unsigned int columns);
 int isNumber(const char * str);
 int isXBeforeY (const char * x, const char * y, int areNumbers);
 int isNumericColumn(char *** table, int rows, int columnIndex);
-int findCSVFiles(const char * dirPath, char ** csvPaths, int * numFound);
+int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 
 #endif /* tools_h */
