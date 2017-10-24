@@ -11,6 +11,7 @@
 		93E3C5991F9C02F600ECE024 /* tools.c in Sources */ = {isa = PBXBuildFile; fileRef = 93E3C5931F9C02F600ECE024 /* tools.c */; };
 		93E3C59A1F9C02F600ECE024 /* sorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 93E3C5961F9C02F600ECE024 /* sorter.c */; };
 		93E3C59B1F9C02F600ECE024 /* analyser.c in Sources */ = {isa = PBXBuildFile; fileRef = 93E3C5971F9C02F600ECE024 /* analyser.c */; };
+		93EC8B881F9FCE28008A3B46 /* mainTools.c in Sources */ = {isa = PBXBuildFile; fileRef = 93EC8B871F9FCE28008A3B46 /* mainTools.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,8 @@
 		93E3C5961F9C02F600ECE024 /* sorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sorter.c; sourceTree = "<group>"; };
 		93E3C5971F9C02F600ECE024 /* analyser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = analyser.c; sourceTree = "<group>"; };
 		93E3C5981F9C02F600ECE024 /* tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tools.h; sourceTree = "<group>"; };
+		93EC8B861F9FCE28008A3B46 /* mainTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mainTools.h; sourceTree = "<group>"; };
+		93EC8B871F9FCE28008A3B46 /* mainTools.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mainTools.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 			isa = PBXGroup;
 			children = (
 				93E3C58C1F9C028800ECE024 /* main.c */,
+				93EC8B861F9FCE28008A3B46 /* mainTools.h */,
+				93EC8B871F9FCE28008A3B46 /* mainTools.c */,
 				93E3C5941F9C02F600ECE024 /* analyser.h */,
 				93E3C5971F9C02F600ECE024 /* analyser.c */,
 				93E3C5951F9C02F600ECE024 /* sorter.h */,
@@ -137,6 +142,7 @@
 				93E3C58D1F9C028800ECE024 /* main.c in Sources */,
 				93E3C59A1F9C02F600ECE024 /* sorter.c in Sources */,
 				93E3C59B1F9C02F600ECE024 /* analyser.c in Sources */,
+				93EC8B881F9FCE28008A3B46 /* mainTools.c in Sources */,
 				93E3C5991F9C02F600ECE024 /* tools.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
