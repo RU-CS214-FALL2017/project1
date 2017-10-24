@@ -279,11 +279,23 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
     return 1;
 }
 
-// --------------
-// | INCOMPLETE |
-// --------------
+// ----------------------------
+// | THIS IS YOUR JOB COASTA! |
+// ----------------------------
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
 int isProperCsv(const char * csvPath) {
-    
     return 1;
+}
+
+// ----------------------------
+// | THIS IS YOUR JOB COASTA! |
+// ----------------------------
+// <path> is a path to a file or directory. This function should point
+// <lineage>'s refrence to a newly allocated array of (char *), let's
+// call it arr, such that arr[0] is the name of the file or directory
+// pointed to by <path> and arr[n] is the parent directory of arr[n-1]
+// for all n where 0 < n < return value. This function returns the number
+// of elements in arr.
+int lineageParser(const char * path, char * ** lineage) {
+    return 0;
 }
