@@ -23,5 +23,6 @@ int isXBeforeY (const char * x, const char * y, int areNumbers);
 int isNumericColumn(char *** table, int rows, int columnIndex);
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
+unsigned int lineageParser(const char * path, char * ** lineage);
 
 #endif /* tools_h */

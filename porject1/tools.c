@@ -296,6 +296,6 @@ int isProperCsv(const char * csvPath) {
 // pointed to by <path> and arr[n] is the parent directory of arr[n-1]
 // for all n where 0 < n < return value. This function returns the number
 // of elements in arr.
-int lineageParser(const char * path, char * ** lineage) {
+unsigned int lineageParser(const char * path, char * ** lineage) {
     return 0;
 }
