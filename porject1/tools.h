@@ -2,6 +2,7 @@
 #define tools_h
 
 #include <stdio.h>
+#include <sys/types.h>
 
 #define TEMPSIZE 4096
 
