@@ -1,17 +1,82 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <unistd.h>
 
 #include "tools.h"
 #include "sorter.h"
 #include "analyser.h"
+#include "mainTools.h"
 
-//int main(int argc, const char ** argv) {
-//
-//
-//}
+int main() {
+    
+    int test = 5;
+    
+    
+    pid_t * children = multiFork(test);
+    
+    if (children != NULL) {
+        
+        printf("children pids: \n");
+        for (int i = 0; i < test; i++) {
+            printf("%d\n", children[i]);
+        }
+        
+        printf("waits: \n");
+        for (int i = 0; i < test; i++) {
+            printf("%d\n", waitpid(children[i], NULL, WUNTRACED));
+        }
+        
+    }
+    
+    
+    return 0;
+}
 
-int main(int argc, char ** argv) {
+
+
+
+
+
+
+
+
+
+
+int main3(int argc, char ** argv) {
+    
+    char * columnHeader = getColumnHeader(argc, argv);
+    char * inputDirecory = getInputDirectory(argc, argv);
+    
+    if (inputDirecory == NULL) {
+        inputDirecory = ".";
+    }
+    
+    char ** csvPaths;
+    int numCsv;
+    
+    if (findCsvFiles(inputDirecory, &csvPaths, &numCsv)) {
+        
+        pid_t children[numCsv];
+        pid_t pid = fork();
+        children[0] = pid;
+        
+        for (int i = 1; i < numCsv && pid > 0; i++) {
+            
+            pid = fork();
+            children[i] = pid;
+        }
+        
+    } else {
+        
+        fprintf(stderr, "Specified directory not found: %s\n", inputDirecory);
+        exit(EXIT_FAILURE);
+    }
+    
+    exit(EXIT_SUCCESS);
+}
+
+int main2(int argc, char ** argv) {
 
     for (int i = 0; i < argc; i++) { // Loops through arguments.
 

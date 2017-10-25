@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include "tools.h"
 
@@ -203,11 +204,10 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
 }
 
 // Finds all "propper" .csv files in the path <dirPath> and all subdirectories.
-// <foundCsv>' is a pre-allocated array of char * to be filled with's refrence
-// will point to a newly allocated array of strings with paths to all "proper"
-// .csv files found. <numFound>'s refrence will be set to the number of "proper"
-// .csv files found. Returns 1 if the directory at <dirPath> is found, and 0
-// otherwise.
+// <foundCsv>'s refrence will point to a newly allocated array of strings with
+// paths to all "proper" .csv files found. <numFound>'s refrence will be set to
+// the number of "proper" .csv files found. Returns 1 if the directory at <dirPath>
+// is found, and 0 otherwise.
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound) {
 
     (*csvPaths) = (char **) malloc(sizeof(char *) * TEMPSIZE);
@@ -298,4 +298,26 @@ int isProperCsv(const char * csvPath) {
 // of elements in arr.
 unsigned int lineageParser(const char * path, char * ** lineage) {
     return 0;
+}
+
+// Creates <num> child processes of the parent. Returns an array
+// containing the pid of children to the parent. Returns NULL
+// to all children.
+pid_t * multiFork(int num) {
+    
+    pid_t parent = getpid();
+    pid_t children[num];
+    
+    for (int i = 0; i < num && getpid() == parent; i++) {
+        children[i] = fork();
+    }
+    
+    if (getpid() == parent) {
+        
+        pid_t * ret = malloc(sizeof(pid_t) * num);
+        ret = memcpy(ret, children, sizeof(pid_t) * num);
+        return ret;
+    }
+    
+    return NULL;
 }

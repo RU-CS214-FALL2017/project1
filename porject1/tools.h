@@ -24,5 +24,6 @@ int isNumericColumn(char *** table, int rows, int columnIndex);
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
+pid_t * multiFork(int num);
 
 #endif /* tools_h */

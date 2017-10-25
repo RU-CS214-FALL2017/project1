@@ -4,6 +4,10 @@
 
 #include "mainTools.h"
 
+char * getFlagValue(const char * flag, int argc, char ** argv);
+char * getFlagValueHelper(int flagIndex, int argc, char ** argv);
+int findFlag(const char * flag, int argc, char ** argv);
+
 // Returns the column header to sort by. If <argv> doesn't
 // have a specified column header, the functions prints an
 // error and exits with a failure of status.
@@ -19,6 +23,16 @@ char * getColumnHeader(int argc, char ** argv) {
     } else {
         return columnHeader;
     }
+}
+
+// Returns the input directory if found in <argv>, else returns NULL.
+char * getInputDirectory(int argc, char ** argv) {
+    return getFlagValue("-d", argc, argv);
+}
+
+// Returns the output directory if found in <argv>, else returns NULL.
+char * getOutputDirectory(int argc, char ** argv) {
+    return getFlagValue("-o", argc, argv);
 }
 
 // Returns the value of <flag> in <argv> with <argc> elements.
