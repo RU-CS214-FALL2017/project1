@@ -10,30 +10,30 @@
 #include "analyser.h"
 #include "mainTools.h"
 
-//int main() {
-//
-//    int test = 5;
-//
-//
-//    pid_t * children = multiFork(test);
-//
-//    if (children != NULL) {
-//
-//        printf("children pids: \n");
-//        for (int i = 0; i < test; i++) {
-//            printf("%d\n", children[i]);
-//        }
-//
-//        printf("waits: \n");
-//        for (int i = 0; i < test; i++) {
-//            printf("%d\n", wait(NULL));
-//        }
-//
-//    }
-//
-//
-//    exit(EXIT_SUCCESS);
-//}
+int main() {
+
+    int test = 5;
+
+
+    pid_t * children = multiFork(test);
+
+    if (children != NULL) {
+
+        printf("children pids: \n");
+        for (int i = 0; i < test; i++) {
+            printf("%d\n", children[i]);
+        }
+
+        printf("waits: \n");
+        for (int i = 0; i < test; i++) {
+            printf("%d\n", wait(NULL));
+        }
+
+    }
+
+
+    exit(EXIT_SUCCESS);
+}
 
 
 
