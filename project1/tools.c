@@ -13,8 +13,8 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
 // of A, and <row>'s refrence is set to point to A. Returns the
-// number elements in A (columns). To free, free each (*row)[i]
-// (0 <= i < # of elements in A) and free *row.
+// number elements in A (columns). To free, free each (*<row>)[i]
+// (0 <= i < # of elements in A) and free *<row>.
 unsigned int tokenizeRow(const char * line, char * ** row) {
     
     *row = (char **) malloc(strlen(line) * sizeof(char *));
@@ -106,7 +106,8 @@ void removeChars (char * str, unsigned long startIndex, unsigned long endIndex) 
 // refrence is set to point to the created "table". <rows>' refrence
 // is set to the numbers of rows in "table". <columns>' refrence is
 // set to the number of columns in "table". To free, free each
-// (*table)[i][j] (0 <= i < *rows, 0 <= j < *columns) and free *table.
+// (*<table>)[i][j] (0 <= i < *<rows>, 0 <= j < *<columns>) and free
+// *<table>.
 void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned int * columns) {
     
     *table = (char ***) malloc(4194304 * sizeof(char **));
@@ -210,7 +211,8 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
 // <foundCsv>'s refrence will point to a newly allocated array of strings with
 // paths to all "proper" .csv files found. <numFound>'s refrence will be set to
 // the number of "proper" .csv files found. Returns 1 if the directory at <dirPath>
-// is found, and 0 otherwise.
+// is found, and 0 otherwise. To free, free all (*<csvPaths>)[i] (0 <= i < *<numFound>)
+// and free *<csvPaths>.
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound) {
 
     (*csvPaths) = (char **) malloc(sizeof(char *) * TEMPSIZE);
@@ -218,7 +220,7 @@ int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound) {
     
     if (findCsvFilesHelper(dirPath, *csvPaths, numFound)) {
         
-        (*csvPaths) = realloc(*csvPaths, sizeof(char *) * (*numFound));
+        (*csvPaths) = (char **) realloc(*csvPaths, sizeof(char *) * (*numFound));
         return 1;
         
     } else {
@@ -328,7 +330,8 @@ pid_t * multiFork(int num) {
 // Returns a newly allocated copy of <source> of size <size> to all children.
 // Returns NULL to the parent. <pipedFd> is a pre-piped file-descriptor,
 // <isParent> is non-0 if the caller is the parent process, <numChildren> is
-// the number of children.
+// the number of children. To free, free the returned pointer in all child
+// processes.
 void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2],
                           int isParent, int numChildren) {
     
