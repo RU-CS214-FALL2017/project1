@@ -4,6 +4,28 @@
 #include "tools.h"
 #include "sorter.h"
 
+void sortCsv(const char * csvPath, const char * columnHeader, const char * outputDir) {
+    
+    FILE * csv = fopen(csvPath, "r");
+    
+    char *** table;
+    unsigned int rows;
+    unsigned int columns;
+    
+    fillTable(csv, &table, &rows, &columns);
+    
+    if (sortByHeader(columnHeader, table, rows, columns)) {
+        printTable(table, rows, columns);
+        
+    } else {
+        
+        fprintf(stderr, "Specified column header not found: %s", columnHeader);
+        exit(EXIT_FAILURE);
+    }
+    
+    
+}
+
 void merge(char *** table, const unsigned int columnIndex, const int areNumbers,
            const unsigned int start, const unsigned int mid,  const unsigned int end);
 
