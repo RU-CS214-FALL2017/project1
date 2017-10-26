@@ -19,6 +19,9 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     
     if (sortByHeader(columnHeader, table, rows, columns)) {
         
+        char ** csvLineage;
+        unsigned int lineageNum = lineageParser(csvPath, &csvLineage);
+        
         FILE * sortedCsv = fopen(outputDir, "w");
         printTable(sortedCsv, table, rows, columns);
         

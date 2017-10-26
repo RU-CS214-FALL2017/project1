@@ -300,7 +300,8 @@ int isProperCsv(const char * csvPath) {
 // call it arr, such that arr[0] is the name of the file or directory
 // pointed to by <path> and arr[n] where n > 0 is the parent directory
 // of arr[n-1] for all n where 0 < n < return value. This function returns
-// the number of elements in arr.
+// the number of elements in arr. To free, free (*<lineage>)[i] (0 <= i <
+// returned value) and free *<lineage>.
 unsigned int lineageParser(const char * path, char * ** lineage) {
     return 0;
 }
