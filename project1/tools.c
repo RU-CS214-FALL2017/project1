@@ -138,29 +138,29 @@ void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned i
 }
 
 // Prints <table> with <rows> rows and <columns> columns in a
-// csv (comma seperated values) format.
-void printTable (char *** table, unsigned int rows, unsigned int columns) {
+// csv (comma seperated values) format to <stream>.
+void printTable (FILE * stream, char *** table, unsigned int rows, unsigned int columns) {
     
     for (int i = 0; i < rows; i++) {
         
         if(strchr(table[i][0], ',') != NULL) {
-            printf("\"%s\"", table[i][0]);
+            fprintf(stream, "\"%s\"", table[i][0]);
             
         } else {
-            printf("%s", table[i][0]);
+            fprintf(stream, "%s", table[i][0]);
         }
         
         for (int j = 1; j < columns; j++) {
             
             if(strchr(table[i][j], ',') != NULL) {
-                printf(",\"%s\"", table[i][j]);
+                fprintf(stream, ",\"%s\"", table[i][j]);
                 
             } else {
-                printf(",%s", table[i][j]);
+                fprintf(stream, ",%s", table[i][j]);
             }
         }
         
-        printf("\n");
+        fprintf(stream, "\n");
     }
 }
 
