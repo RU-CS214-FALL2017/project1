@@ -74,20 +74,3 @@ int findFlag(const char * flag, int argc, char ** argv) {
     
     return -1;
 }
-
-// Frees <table>'s refrence with <rows> rows and
-// <columns> columns from the heap.
-void freeTable(char * *** table, int rows, int columns) {
-    
-    for (int i = 0; i < rows; i++) {
-        
-        for (int j = 0; j < columns; j++) {
-            
-            free((*table)[i][j]);
-        }
-        
-        free((*table)[i]);
-    }
-    
-    free(*table);
-}

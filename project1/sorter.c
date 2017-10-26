@@ -4,6 +4,9 @@
 #include "tools.h"
 #include "sorter.h"
 
+// Sorts a the CSV file at <csvPath> in ascending order
+// on the column header <columnHeader>. Saves the sorted
+// csv file in <outputDir>.
 void sortCsv(const char * csvPath, const char * columnHeader, const char * outputDir) {
     
     FILE * csv = fopen(csvPath, "r");
@@ -15,15 +18,27 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     fillTable(csv, &table, &rows, &columns);
     
     if (sortByHeader(columnHeader, table, rows, columns)) {
-        printTable(table, rows, columns);
+        
+        FILE * sortedCsv = fopen(outputDir, "w");
+        printTable(sortedCsv, table, rows, columns);
         
     } else {
         
-        fprintf(stderr, "Specified column header not found: %s", columnHeader);
+        fprintf(stderr, "Specified column header, %s, not found in %s", columnHeader, csvPath);
         exit(EXIT_FAILURE);
     }
     
+    for (int i = 0; i < rows; i++) {
+        
+        for (int j = 0; j < columns; j++) {
+            
+            free((table)[i][j]);
+        }
+        
+        free((table)[i]);
+    }
     
+    free(table);
 }
 
 void merge(char *** table, const unsigned int columnIndex, const int areNumbers,
