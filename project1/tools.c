@@ -10,10 +10,11 @@
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
 
-// <row> is the address to a char **.
-// Creates a array of strings A, where each comma seperated value
-// from <line> is an element of A, and <row>'s refrence is set to point to A.
-// Returns the number elements in A (columns).
+// <row> is the address to a char **. Creates a array of strings
+// A, where each comma seperated value from <line> is an element
+// of A, and <row>'s refrence is set to point to A. Returns the
+// number elements in A (columns). To free, free each (*row)[i]
+// (0 <= i < # of elements in A) and free *row.
 unsigned int tokenizeRow(const char * line, char * ** row) {
     
     *row = (char **) malloc(strlen(line) * sizeof(char *));
@@ -97,14 +98,15 @@ void removeChars (char * str, unsigned long startIndex, unsigned long endIndex) 
     }
 }
 
-// <table> is an address to a char ***.
-// <rows> is an address to an unsigned int.
-// <columns> is an address to an unsigned int.
-// Creates a "table" from <csvFile> as a 2D string array, where A[n][m] will return a string
-// representation of the data stored in the (n+1)th row and (m+1)th column of the "table".
-// <table>'s refrence is set to point to the created "table".
-// <rows>' refrence is set to the numbers of rows in "table".
-// <columns>' refrence is set to the number of columns in "table".
+// <table> is an address to a char ***. <rows> is an address to
+// an unsigned int. <columns> is an address to an unsigned int.
+// Creates a "table" from <csvFile> as a 2D string array, where
+// A[n][m] will return a string representation of the data stored
+// in the (n+1)th row and (m+1)th column of the "table". <table>'s
+// refrence is set to point to the created "table". <rows>' refrence
+// is set to the numbers of rows in "table". <columns>' refrence is
+// set to the number of columns in "table". To free, free each
+// (*table)[i][j] (0 <= i < *rows, 0 <= j < *columns) and free *table.
 void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned int * columns) {
     
     *table = (char ***) malloc(4194304 * sizeof(char **));
