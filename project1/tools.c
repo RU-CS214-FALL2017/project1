@@ -307,7 +307,8 @@ unsigned int lineageParser(const char * path, char * ** lineage) {
 
 // Creates <num> child processes of the parent. Returns a newly
 // allocated array containing the pid of children to the parent.
-// Returns NULL to all children.
+// Returns NULL to all children. To free, free the returned
+// pointer.
 pid_t * multiFork(int num) {
     
     pid_t parent = getpid();
