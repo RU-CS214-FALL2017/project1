@@ -294,9 +294,9 @@ int isProperCsv(const char * csvPath) {
 // <path> is a path to a file or directory. This function should point
 // <lineage>'s refrence to a newly allocated array of (char *), let's
 // call it arr, such that arr[0] is the name of the file or directory
-// pointed to by <path> and arr[n] is the parent directory of arr[n-1]
-// for all n where 0 < n < return value. This function returns the number
-// of elements in arr.
+// pointed to by <path> and arr[n] where n > 0 is the parent directory
+// of arr[n-1] for all n where 0 < n < return value. This function returns
+// the number of elements in arr.
 unsigned int lineageParser(const char * path, char * ** lineage) {
     return 0;
 }
