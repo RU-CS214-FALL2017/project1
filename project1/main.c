@@ -10,33 +10,96 @@
 #include "analyser.h"
 #include "mainTools.h"
 
+void my_write(int fd, const void *buf, size_t bytes_to_write);
+int my_read(int fd, void *buf, size_t bytes_to_read);
+
 int main() {
 
     int test = 5;
-
+    int index = 4;
+    
+    int fd[2];
+    pipe(fd);
 
     pid_t * children = multiFork(test);
-
+    pid_t * pids = (pid_t *) pipeData(children, sizeof(pid_t) * test, fd, children != NULL, test);
+    
     if (children != NULL) {
-
-        printf("children pids: \n");
+        printf("parent: \n");
         for (int i = 0; i < test; i++) {
             printf("%d\n", children[i]);
         }
-
-        printf("waits: \n");
+    } else {
+        printf("child: \n");
         for (int i = 0; i < test; i++) {
-            printf("%d\n", wait(NULL));
+            printf("%d\n", pids[i]);
         }
-
     }
 
+//    if (children != NULL) {
+//
+//        close(fd[0]);
+//        for (int i = 0; i < test; i++) {
+//            write(fd[1], children, sizeof(pid_t) * test);
+//        }
+//        close(fd[1]);
+//
+//        printf("parent %d\n", children[index]);
+//    }
+//
+//    if (children == NULL) {
+//
+//        pid_t pids[test];
+//
+//        close(fd[1]);
+//        read(fd[0], pids, sizeof(pid_t) * test);
+//        close(fd[0]);
+//
+//    }
 
     exit(EXIT_SUCCESS);
 }
 
 
+void my_write(int fd, const void *buf, size_t bytes_to_write) {
+    while (bytes_to_write > 0) {
+        ssize_t bytes_written = write(fd, buf, bytes_to_write);
+        if (bytes_written == -1) {
+            perror("write failed");
+            exit(EXIT_FAILURE);
+        }
+        
+        buf            += bytes_written;
+        bytes_to_write -= bytes_written;
+    }
+}
 
+int my_read(int fd, void *buf, size_t bytes_to_read) {
+    int has_read = 0;
+    while (bytes_to_read > 0) {
+        ssize_t bytes_read = read(fd, buf, bytes_to_read);
+        if (bytes_read == -1) {
+            perror("read failed");
+            exit(EXIT_FAILURE);
+        }
+        
+        if (bytes_read == 0) {
+            if (has_read) {
+                fprintf(stderr, "read failed: Premature EOF");
+                exit(EXIT_FAILURE);
+            }
+            
+            return 0;
+        }
+        
+        has_read = 1;
+        
+        buf           += bytes_read;
+        bytes_to_read -= bytes_read;
+    }
+    
+    return 1;
+}
 
 
 

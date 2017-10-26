@@ -26,5 +26,6 @@ int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
 pid_t * multiFork(int num);
+void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2], int isParent, int numChildren);
 
 #endif /* tools_h */

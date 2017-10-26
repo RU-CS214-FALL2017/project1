@@ -322,3 +322,34 @@ pid_t * multiFork(int num) {
     
     return NULL;
 }
+
+// Returns a newly allocated copy of <source> of size <size> to all children.
+// Returns NULL to the parent. <pipedFd> is a pre-piped file-descriptor,
+// <isParent> is non-0 if the caller is the parent process, <numChildren> is
+// the number of children.
+void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2],
+                          int isParent, int numChildren) {
+    
+    if (isParent) {
+        
+        close(pipedFd[0]);
+        
+        for (int i = 0; i < numChildren; i++) {
+            write(pipedFd[1], source, size);
+        }
+        
+        close(pipedFd[1]);
+        
+        return NULL;
+        
+    } else {
+        
+        void * ret = malloc(size);
+        
+        close(pipedFd[1]);
+        read(pipedFd[0], ret, size);
+        close(pipedFd[0]);
+        
+        return ret;
+    }
+}
