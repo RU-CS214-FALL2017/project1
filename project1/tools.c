@@ -11,7 +11,7 @@
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
 
 // <row> is the address to a char **.
-// Creates a array of strings A, where each comma seperated value
+// Creates an array of strings A, where each comma seperated value
 // from <line> is an element of A, and <row>'s refrence is set to point to A.
 // Returns the number elements in A (columns).
 unsigned int tokenizeRow(const char * line, char * ** row) {
@@ -285,7 +285,30 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
 // ----------------------------
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
 int isProperCsv(const char * csvPath) {
-    return 1;
+	FILE *csvFile;
+	csvFile = fopen(csvPath, "r");
+	// make sure there is more than 1 row, and each row has an equal number of columns
+	int rowCount = 0;
+	int colCount = 0;
+	char csvRow[TEMPSIZE];
+	char ** csvRowT;
+	if(csvFile == NULL ){
+		fclose(csvFile);
+		return 0;
+	}
+	fgets(csvRow, TEMPSIZE, csvFile);
+	colCount = tokenizeRow(csvRow, &csvRowT);
+	while(fgets(csvRow, TEMPSIZE, csvFile) != NULL){
+		int thisColCount = tokenizeRow(csvRow, &csvRowT);
+		if(thisColCount != colCount){
+			return 0;
+		}
+		rowCount++;
+	}	
+	if(rowCount<2){
+		return 0;
+	} 
+	return 1;
 }
 
 // ----------------------------
