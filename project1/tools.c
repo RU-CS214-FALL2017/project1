@@ -5,8 +5,10 @@
 #include <limits.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/mman.h>
 
 #include "tools.h"
+#include "sorter.h"
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
 
@@ -207,6 +209,80 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
     return 1;
 }
 
+int processCsvDir(const char * path, struct csvDir * info, const char * columnHeader, const char * outputDir) {
+    
+    DIR * dir = opendir(path);
+    
+    if (dir == NULL) {
+        return 0;
+    }
+    
+    info = (struct csvDir *) myMap(sizeof(struct csvDir));
+    
+    info->pid = getpid();
+    info->path = myMap(strlen(path));
+    strcpy(info->path, path);
+    
+    info->subChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
+    info->subDirs = (struct csvDir *) myMap(sizeof(struct csvDir) * TEMPSIZE);
+    info->numSubDirs = myMap(sizeof(unsigned int));
+    *(info->numSubDirs) = 0;
+    
+    info->csvChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
+    info->csvPaths = (char **) myMap(sizeof(char *) * TEMPSIZE);
+    info->numCsvPaths = myMap(sizeof(unsigned int));
+    *(info->numCsvPaths) = 0;
+    
+    for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
+        
+        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
+            
+            char subDirPath[TEMPSIZE];
+            sprintf(subDirPath, "%s/%s", path, entry->d_name);
+            
+            (info->subChildPids)[*(info->numSubDirs)] = fork();
+            
+            if ((info->subChildPids)[*(info->numSubDirs)] == 0) {
+            
+                processCsvDir(subDirPath, &((info->subDirs)[*(info->numSubDirs)]), columnHeader, outputDir);
+                (*(info->numSubDirs))++;
+            }
+            
+        } else if (entry->d_type == DT_REG) {
+            
+            char csvPath[TEMPSIZE];
+            sprintf(csvPath, "%s/%s", path, entry->d_name);
+            
+            (info->csvChildPids)[*(info->numCsvPaths)] = fork();
+            
+            if ((info->csvChildPids)[*(info->numCsvPaths)] == 0) {
+                
+                if (isProperCsv(csvPath)) {
+                    
+                    (info->csvPaths)[*(info->numCsvPaths)] = myMap(strlen(csvPath) + 1);
+                    strcpy((info->csvPaths)[*(info->numCsvPaths)], csvPath);
+                    (*(info->numCsvPaths))++;
+                    
+                    if (outputDir == NULL) {
+                        sortCsv(csvPath, columnHeader, path);
+                        
+                    } else {
+                        sortCsv(csvPath, columnHeader, outputDir);
+                    }
+                }
+            }
+        }
+    }
+    
+    info->subChildPids = (pid_t *) myReMap(info->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *(info->numSubDirs));
+    info->subDirs = (struct csvDir *) myReMap(info->subDirs, sizeof(struct csvDir) * TEMPSIZE, sizeof(pid_t) * *(info->numSubDirs));
+    
+    info->csvChildPids = (pid_t *) myReMap(info->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *(info->numCsvPaths));
+    info->csvPaths = (char **) myReMap(info->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *(info->numCsvPaths));
+    
+    return 1;
+}
+
 // Finds all "propper" .csv files in the path <dirPath> and all subdirectories.
 // <foundCsv>'s refrence will point to a newly allocated array of strings with
 // paths to all "proper" .csv files found. <numFound>'s refrence will be set to
@@ -386,3 +462,14 @@ void * pipeDataToParent(const void * source, size_t size, int pipedFd[2], int is
         return ret;
     }
 }
+
+// Allocates <size> bytes of memory shared between processes
+// and returns a pointer to the allocated memory.
+void * myMap(size_t size) {
+    return mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+}
+
+void * myReMap(void * address, size_t oldSize, size_t newSize) {
+    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
+}
+

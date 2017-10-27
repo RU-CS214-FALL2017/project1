@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 #include "tools.h"
 #include "sorter.h"
@@ -11,30 +14,22 @@
 #include "mainTools.h"
 
 int main() {
-
-    int test = 5;
-
-    int fd[2];
-    pipe(fd);
-
-    pid_t * children = multiFork(test);
-    pid_t * pids = (pid_t *) pipeDataToChildren(children, sizeof(pid_t) * test, fd, children != NULL, test);
     
-    if (children != NULL) {
-        printf("parent: \n");
-        for (int i = 0; i < test; i++) {
-            printf("%d\n", children[i]);
-        }
-    } else {
-        printf("child: \n");
-        for (int i = 0; i < test; i++) {
-            printf("%d\n", pids[i]);
-        }
-    }
-
-    exit(EXIT_SUCCESS);
+    char * fun = (char *) myMap(1);
+//    munmap(&fun[0], 4-1);
+    
+    fun[0] = 'a';
+    fun[1] = 'b';
+    fun[2] = 'c';
+    fun[3] = 'd';
+    fun[4] = 'e';
+    
+    printf("fun0 %c\n", fun[0]);
+    printf("fun1 %c\n", fun[1]);
+    printf("fun2 %c\n", fun[2]);
+    printf("fun3 %c\n", fun[3]);
+    printf("fun4 %c\n", fun[4]);
 }
-
 
 
 
