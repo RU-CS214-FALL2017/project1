@@ -6,14 +6,6 @@
 
 #define TEMPSIZE 4096
 
-// Represents the info of a file where <path> is the path of
-// the file, and <file> is the stream of data in the file.
-struct FileInfo {
-
-    char * path;
-    FILE * file;
-};
-
 unsigned int tokenizeRow(const char * line, char * ** row);
 void trim (char * str);
 void removeChars (char * str, unsigned long startIndex, unsigned long endIndex);
