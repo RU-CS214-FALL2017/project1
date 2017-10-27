@@ -3,7 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+
 
 #include "tools.h"
 #include "sorter.h"
@@ -32,6 +32,21 @@ int main() {
         }
     }
 
+	const char * path = "C:\\Users\\kkash\\Documents\\John.txt";
+	
+	
+	if(isProperCsv(path)==0){
+		printf("not good");
+		
+	}
+	else if(isProperCsv(path)==1){
+		printf("good");
+	}
+		
+	
+	
+	
+	
     exit(EXIT_SUCCESS);
 }
 

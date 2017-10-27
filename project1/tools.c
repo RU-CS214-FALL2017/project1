@@ -10,18 +10,11 @@
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
 
-<<<<<<< HEAD
-// <row> is the address to a char **.
-// Creates an array of strings A, where each comma seperated value
-// from <line> is an element of A, and <row>'s refrence is set to point to A.
-// Returns the number elements in A (columns).
-=======
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
 // of A, and <row>'s refrence is set to point to A. Returns the
 // number elements in A (columns). To free, free each (*row)[i]
 // (0 <= i < # of elements in A) and free *row.
->>>>>>> master
 unsigned int tokenizeRow(const char * line, char * ** row) {
     
     *row = (char **) malloc(strlen(line) * sizeof(char *));
@@ -289,32 +282,42 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
     return 1;
 }
 
-// ----------------------------
-// | THIS IS YOUR JOB COASTA! |
-// ----------------------------
+// Takes a path to a .csv file. Reads the file line-by-line and tokenizes each 
+// line. Checks the number of columns in the header first, and compares that number 
+// to the number of columns in other rows. Also checks the number of lines in csv.
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
 int isProperCsv(const char * csvPath) {
-	FILE *csvFile;
-	csvFile = fopen(csvPath, "r");
-	// make sure there is more than 1 row, and each row has an equal number of columns
+	
+	FILE *csvFile = fopen(csvPath, "r");
+	
 	int rowCount = 0;
 	int colCount = 0;
+	
 	char csvRow[TEMPSIZE];
 	char ** csvRowT;
+	
 	if(csvFile == NULL ){
+		
 		fclose(csvFile);
 		return 0;
 	}
+	
 	fgets(csvRow, TEMPSIZE, csvFile);
 	colCount = tokenizeRow(csvRow, &csvRowT);
+	rowCount = 1;
+	
 	while(fgets(csvRow, TEMPSIZE, csvFile) != NULL){
+		
 		int thisColCount = tokenizeRow(csvRow, &csvRowT);
 		if(thisColCount != colCount){
 			return 0;
 		}
 		rowCount++;
 	}	
+	
+	fclose(csvFile);
 	if(rowCount<2){
+		
 		return 0;
 	} 
 	return 1;
