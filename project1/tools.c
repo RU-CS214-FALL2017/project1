@@ -284,45 +284,12 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
     return 1;
 }
 
-// Takes a path to a .csv file. Reads the file line-by-line and tokenizes each 
-// line. Checks the number of columns in the header first, and compares that number 
-// to the number of columns in other rows. Also checks the number of lines in csv.
+// ----------------------------
+// | THIS IS YOUR JOB COASTA! |
+// ----------------------------
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
 int isProperCsv(const char * csvPath) {
-	
-	FILE *csvFile = fopen(csvPath, "r");
-	
-	int rowCount = 0;
-	int colCount = 0;
-	
-	char csvRow[TEMPSIZE];
-	char ** csvRowT;
-	
-	if(csvFile == NULL ){
-		
-		fclose(csvFile);
-		return 0;
-	}
-	
-	fgets(csvRow, TEMPSIZE, csvFile);
-	colCount = tokenizeRow(csvRow, &csvRowT);
-	rowCount = 1;
-	
-	while(fgets(csvRow, TEMPSIZE, csvFile) != NULL){
-		
-		int thisColCount = tokenizeRow(csvRow, &csvRowT);
-		if(thisColCount != colCount){
-			return 0;
-		}
-		rowCount++;
-	}	
-	
-	fclose(csvFile);
-	if(rowCount<2){
-		
-		return 0;
-	} 
-	return 1;
+    return 1;
 }
 
 // ----------------------------
