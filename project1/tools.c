@@ -360,3 +360,29 @@ void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2],
         return ret;
     }
 }
+
+// Returns a newly allocated copy of <source> of size <size> to parent.
+// Returns NULL to the child. <pipedFd> is a pre-piped file-descriptor,
+// <isChild> is non-0 if the caller is the child process. To free, free
+// the returned pointer in the parent process.
+void * pipeDataToParent(const void * source, size_t size, int pipedFd[2], int isChild) {
+    
+    if (isChild) {
+        
+        close(pipedFd[0]);
+        write(pipedFd[1], source, size);
+        close(pipedFd[1]);
+        
+        return NULL;
+        
+    } else {
+        
+        void * ret = malloc(size);
+        
+        close(pipedFd[1]);
+        read(pipedFd[0], ret, size);
+        close(pipedFd[0]);
+        
+        return ret;
+    }
+}
