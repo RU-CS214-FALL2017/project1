@@ -21,8 +21,11 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
         
         char ** csvLineage;
         unsigned int lineageNum = lineageParser(csvPath, &csvLineage);
+        char sortedCsvPath[strlen(csvLineage[0]) + strlen(outputDir) + 1];
+        sprintf(sortedCsvPath, "%s/%s", outputDir, csvLineage[0]);
         
-        FILE * sortedCsv = fopen(outputDir, "w");
+        
+        FILE * sortedCsv = fopen(sortedCsvPath, "w");
         printTable(sortedCsv, table, rows, columns);
         
     } else {
