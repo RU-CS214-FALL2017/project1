@@ -12,6 +12,7 @@
 		93E3C59A1F9C02F600ECE024 /* sorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 93E3C5961F9C02F600ECE024 /* sorter.c */; };
 		93E3C59B1F9C02F600ECE024 /* analyser.c in Sources */ = {isa = PBXBuildFile; fileRef = 93E3C5971F9C02F600ECE024 /* analyser.c */; };
 		93EC8B881F9FCE28008A3B46 /* mainTools.c in Sources */ = {isa = PBXBuildFile; fileRef = 93EC8B871F9FCE28008A3B46 /* mainTools.c */; };
+		93F813CA1FA2948700645F79 /* free.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F813C91FA2948700645F79 /* free.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +38,8 @@
 		93E3C5981F9C02F600ECE024 /* tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tools.h; sourceTree = "<group>"; };
 		93EC8B861F9FCE28008A3B46 /* mainTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mainTools.h; sourceTree = "<group>"; };
 		93EC8B871F9FCE28008A3B46 /* mainTools.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mainTools.c; sourceTree = "<group>"; };
+		93F813C81FA2948700645F79 /* free.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = free.h; sourceTree = "<group>"; };
+		93F813C91FA2948700645F79 /* free.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = free.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +79,8 @@
 				93E3C5971F9C02F600ECE024 /* analyser.c */,
 				93E3C5951F9C02F600ECE024 /* sorter.h */,
 				93E3C5961F9C02F600ECE024 /* sorter.c */,
+				93F813C81FA2948700645F79 /* free.h */,
+				93F813C91FA2948700645F79 /* free.c */,
 				93E3C5981F9C02F600ECE024 /* tools.h */,
 				93E3C5931F9C02F600ECE024 /* tools.c */,
 			);
@@ -140,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93E3C58D1F9C028800ECE024 /* main.c in Sources */,
+				93F813CA1FA2948700645F79 /* free.c in Sources */,
 				93E3C59A1F9C02F600ECE024 /* sorter.c in Sources */,
 				93E3C59B1F9C02F600ECE024 /* analyser.c in Sources */,
 				93EC8B881F9FCE28008A3B46 /* mainTools.c in Sources */,
