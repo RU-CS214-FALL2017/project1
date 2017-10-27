@@ -470,6 +470,6 @@ void * myMap(size_t size) {
 }
 
 void * myReMap(void * address, size_t oldSize, size_t newSize) {
-    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
+    return mremap(address, oldSize, newSize, 0);
 }
 
