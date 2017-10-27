@@ -3,6 +3,7 @@
 
 #include "tools.h"
 #include "sorter.h"
+#include "free.h"
 
 // Sorts a the CSV file at <csvPath> in ascending order
 // on the column header <columnHeader>. Saves the sorted
@@ -21,8 +22,12 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
         
         char ** csvLineage;
         unsigned int lineageNum = lineageParser(csvPath, &csvLineage);
+        
         char sortedCsvPath[strlen(csvLineage[0]) + strlen(outputDir) + 1];
         sprintf(sortedCsvPath, "%s/%s", outputDir, csvLineage[0]);
+        
+        doubleFree(csvLineage, lineageNum);
+        
         
         
         FILE * sortedCsv = fopen(sortedCsvPath, "w");

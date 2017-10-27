@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-void doubleFree(void ** alloc, int x);
-void tripleFree(void *** alloc, int x, int y);
+void doubleFree(char ** alloc, int x);
+void tripleFree(char *** alloc, int x, int y);
 
 #endif /* free_h */
