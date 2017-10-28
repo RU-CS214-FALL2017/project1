@@ -292,7 +292,7 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
     (*info)->subDirs = (struct csvDir **) myReMap((*info)->subDirs, sizeof(struct csvDir *) * TEMPSIZE, sizeof(struct csvDir *) * *((*info)->numSubDirs));
 
     (*info)->csvChildPids = (pid_t *) myReMap((*info)->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numCsvPaths));
-    (*info)->csvPaths = (char **) myReMap((*info)->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
+    (*info)->csvPaths = (char **) myReMap((*info)->csvPaths, sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
     
     for (int i = 0; i < (*((*info)->numSubDirs) + *((*info)->numCsvPaths)); i++) {
         wait(NULL);
