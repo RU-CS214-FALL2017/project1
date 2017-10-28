@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #include "tools.h"
 #include "sorter.h"
@@ -490,7 +491,7 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
     if (remap == MAP_FAILED) {
         
-        printf("error remapping\n");
+        printf("error remapping: %d\n", errno);
         return address;
     }
     
