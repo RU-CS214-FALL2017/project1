@@ -542,6 +542,7 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
             return address;
         }
         
+        printf("remap good\n");
         return remap;
     }
 }
