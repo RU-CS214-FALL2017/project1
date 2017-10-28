@@ -15,20 +15,17 @@
 
 int main() {
     
-    char * fun = (char *) myMap(1);
-//    munmap(&fun[0], 4-1);
+    pid_t parent = getpid();
+    struct csvDir * info;
+    processCsvDir(".", &info, NULL, NULL);
     
-    fun[0] = 'a';
-    fun[1] = 'b';
-    fun[2] = 'c';
-    fun[3] = 'd';
-    fun[4] = 'e';
+    if (getpid() == parent){
+        
+        printf("%d %d\n", info->numSubDirs, info->numSubDirs);
+        
+    }
     
-    printf("fun0 %c\n", fun[0]);
-    printf("fun1 %c\n", fun[1]);
-    printf("fun2 %c\n", fun[2]);
-    printf("fun3 %c\n", fun[3]);
-    printf("fun4 %c\n", fun[4]);
+    exit(EXIT_SUCCESS);
 }
 
 

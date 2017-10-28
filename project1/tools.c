@@ -210,7 +210,8 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
     return 1;
 }
 
-int processCsvDir(const char * path, struct csvDir * info, const char * columnHeader, const char * outputDir) {
+// fill this out!!
+int processCsvDir(const char * path, struct csvDir * * info, const char * columnHeader, const char * outputDir) {
     
     DIR * dir = opendir(path);
     
@@ -218,21 +219,22 @@ int processCsvDir(const char * path, struct csvDir * info, const char * columnHe
         return 0;
     }
     
-    info = (struct csvDir *) myMap(sizeof(struct csvDir));
+    (*info) = (struct csvDir *) myMap(sizeof(struct csvDir));
     
-    info->pid = getpid();
-    info->path = myMap(strlen(path));
-    strcpy(info->path, path);
+    (*info) ->pid = myMap(sizeof(pid_t));
+    *((*info)->pid) = getpid();
+    (*info)->path = myMap(strlen(path));
+    strcpy((*info)->path, path);
     
-    info->subChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
-    info->subDirs = (struct csvDir *) myMap(sizeof(struct csvDir) * TEMPSIZE);
-    info->numSubDirs = myMap(sizeof(unsigned int));
-    *(info->numSubDirs) = 0;
+    (*info)->subChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
+    (*info)->subDirs = (struct csvDir *) myMap(sizeof(struct csvDir) * TEMPSIZE);
+    (*info)->numSubDirs = myMap(sizeof(unsigned int));
+    *((*info)->numSubDirs) = 0;
     
-    info->csvChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
-    info->csvPaths = (char **) myMap(sizeof(char *) * TEMPSIZE);
-    info->numCsvPaths = myMap(sizeof(unsigned int));
-    *(info->numCsvPaths) = 0;
+    (*info)->csvChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
+    (*info)->csvPaths = (char **) myMap(sizeof(char *) * TEMPSIZE);
+    (*info)->numCsvPaths = myMap(sizeof(unsigned int));
+    *((*info)->numCsvPaths) = 0;
     
     for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
         
@@ -241,12 +243,13 @@ int processCsvDir(const char * path, struct csvDir * info, const char * columnHe
             char subDirPath[TEMPSIZE];
             sprintf(subDirPath, "%s/%s", path, entry->d_name);
             
-            (info->subChildPids)[*(info->numSubDirs)] = fork();
+            ((*info)->subChildPids)[*((*info)->numSubDirs)] = fork();
             
-            if ((info->subChildPids)[*(info->numSubDirs)] == 0) {
+            if (((*info)->subChildPids)[*((*info)->numSubDirs)] == 0) {
             
-                processCsvDir(subDirPath, &((info->subDirs)[*(info->numSubDirs)]), columnHeader, outputDir);
-                (*(info->numSubDirs))++;
+                struct csvDir * subInfo = &(((*info)->subDirs)[*((*info)->numSubDirs)]);
+                processCsvDir(subDirPath, &subInfo, columnHeader, outputDir);
+                (*((*info)->numSubDirs))++;
             }
             
         } else if (entry->d_type == DT_REG) {
@@ -254,32 +257,35 @@ int processCsvDir(const char * path, struct csvDir * info, const char * columnHe
             char csvPath[TEMPSIZE];
             sprintf(csvPath, "%s/%s", path, entry->d_name);
             
-            (info->csvChildPids)[*(info->numCsvPaths)] = fork();
+            ((*info)->csvChildPids)[*((*info)->numCsvPaths)] = fork();
             
-            if ((info->csvChildPids)[*(info->numCsvPaths)] == 0) {
+            if (((*info)->csvChildPids)[*((*info)->numCsvPaths)] == 0) {
                 
                 if (isProperCsv(csvPath)) {
                     
-                    (info->csvPaths)[*(info->numCsvPaths)] = myMap(strlen(csvPath) + 1);
-                    strcpy((info->csvPaths)[*(info->numCsvPaths)], csvPath);
-                    (*(info->numCsvPaths))++;
+                    ((*info)->csvPaths)[*((*info)->numCsvPaths)] = myMap(strlen(csvPath) + 1);
+                    strcpy(((*info)->csvPaths)[*((*info)->numCsvPaths)], csvPath);
+                    (*((*info)->numCsvPaths))++;
                     
-                    if (outputDir == NULL) {
-                        sortCsv(csvPath, columnHeader, path);
-                        
-                    } else {
-                        sortCsv(csvPath, columnHeader, outputDir);
-                    }
+//                    if (outputDir == NULL) {
+//                        sortCsv(csvPath, columnHeader, path);
+//
+//                    } else {
+//                        sortCsv(csvPath, columnHeader, outputDir);
+//                    }
                 }
             }
         }
     }
     
-    info->subChildPids = (pid_t *) myReMap(info->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *(info->numSubDirs));
-    info->subDirs = (struct csvDir *) myReMap(info->subDirs, sizeof(struct csvDir) * TEMPSIZE, sizeof(pid_t) * *(info->numSubDirs));
-    
-    info->csvChildPids = (pid_t *) myReMap(info->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *(info->numCsvPaths));
-    info->csvPaths = (char **) myReMap(info->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *(info->numCsvPaths));
+    if (getpid() == *((*info)->pid)) {
+        
+        (*info)->subChildPids = (pid_t *) myReMap((*info)->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
+        (*info)->subDirs = (struct csvDir *) myReMap((*info)->subDirs, sizeof(struct csvDir) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
+     
+        (*info)->csvChildPids = (pid_t *) myReMap((*info)->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numCsvPaths));
+        (*info)->csvPaths = (char **) myReMap((*info)->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
+    }
     
     return 1;
 }
