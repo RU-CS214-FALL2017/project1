@@ -248,10 +248,11 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
                 sprintf(subDirPath, "%s/%s", path, entry->d_name);
 
                 processCsvDir(subDirPath, &(((*info)->subDirs)[*((*info)->numSubDirs)]), columnHeader, outputDir);
-                (*((*info)->numSubDirs))++;
                 
                 return 1;
             }
+            
+            (*((*info)->numSubDirs))++;
             
         } else if (entry->d_type == DT_REG) {
             
@@ -266,7 +267,6 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
                     
                     ((*info)->csvPaths)[*((*info)->numCsvPaths)] = myMap(strlen(csvPath) + 1);
                     strcpy(((*info)->csvPaths)[*((*info)->numCsvPaths)], csvPath);
-                    (*((*info)->numCsvPaths))++;
                     
 //                    if (outputDir == NULL) {
 //                        sortCsv(csvPath, columnHeader, path);
@@ -278,6 +278,8 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
                 
                 return 1;
             }
+            
+            (*((*info)->numCsvPaths))++;
         }
     }
     
