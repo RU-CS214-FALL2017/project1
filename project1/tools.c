@@ -490,7 +490,7 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
     if (remap == MAP_FAILED) {
         
-        printf("error remapping");
+        printf("error remapping\n");
         return address;
     }
     

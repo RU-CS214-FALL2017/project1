@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include "tools.h"
 #include "sorter.h"
@@ -26,6 +27,7 @@ int main() {
         }
     
         printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
+        printf("error: %d\n", errno);
         
     }
 
