@@ -487,31 +487,39 @@ void * myMap(size_t size) {
 
 void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
-    void * remap = mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
-    
-    if (remap == MAP_FAILED) {
+    if (newSize == 0) {
         
-        char * err = "fuck you";
+        munmap(address, oldSize);
+        return NULL;
         
-        switch (errno) {
-            case EAGAIN:
-                err = "again";
-                break;
-            case EFAULT:
-                err = "fault";
-                break;
-            case EINVAL:
-                err = "inval";
-                break;
-            case ENOMEM:
-                err = "nomem";
-                break;
+    } else {
+        
+        void * remap = mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
+        
+        if (remap == MAP_FAILED) {
+            
+            char * err = "fuck you";
+            
+            switch (errno) {
+                case EAGAIN:
+                    err = "again";
+                    break;
+                case EFAULT:
+                    err = "fault";
+                    break;
+                case EINVAL:
+                    err = "inval";
+                    break;
+                case ENOMEM:
+                    err = "nomem";
+                    break;
+            }
+            
+            printf("error remapping: %s\n", err);
+            return address;
         }
         
-        printf("error remapping: %s\n", err);
-        return address;
+        return remap;
     }
-    
-    return remap;
 }
 
