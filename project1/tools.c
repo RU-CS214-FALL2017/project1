@@ -283,11 +283,15 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
         }
     }
     
-    (*info)->subChildPids = (pid_t *) myReMap((*info)->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
-    (*info)->subDirs = (struct csvDir **) myReMap((*info)->subDirs, sizeof(struct csvDir *) * TEMPSIZE, sizeof(struct csvDir *) * *((*info)->numSubDirs));
- 
-    (*info)->csvChildPids = (pid_t *) myReMap((*info)->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numCsvPaths));
-    (*info)->csvPaths = (char **) myReMap((*info)->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
+    for (int i = 0; i < (*((*info)->numSubDirs) + *((*info)->numCsvPaths)); i++) {
+        wait(NULL);
+    }
+
+//    (*info)->subChildPids = (pid_t *) myReMap((*info)->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
+//    (*info)->subDirs = (struct csvDir **) myReMap((*info)->subDirs, sizeof(struct csvDir *) * TEMPSIZE, sizeof(struct csvDir *) * *((*info)->numSubDirs));
+//
+//    (*info)->csvChildPids = (pid_t *) myReMap((*info)->csvChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numCsvPaths));
+//    (*info)->csvPaths = (char **) myReMap((*info)->csvChildPids, sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
     
     return 1;
 }
@@ -478,7 +482,7 @@ void * myMap(size_t size) {
     return mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 }
 
-void * myReMap(void * address, size_t oldSize, size_t newSize) {
-    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
-}
+//void * myReMap(void * address, size_t oldSize, size_t newSize) {
+//    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
+//}
 
