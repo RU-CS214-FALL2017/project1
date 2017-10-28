@@ -491,7 +491,7 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
     if (newSize == 0) {
         
-        munmap(address, oldSize)
+        munmap(address, oldSize);
         return NULL;
     }
         
