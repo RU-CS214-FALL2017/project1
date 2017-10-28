@@ -35,51 +35,51 @@ int main() {
 
 
 
-int main3(int argc, char ** argv) {
-
-    char * columnHeader = getColumnHeader(argc, argv);
-    char * inputDirecory = getInputDirectory(argc, argv);
-
-    if (inputDirecory == NULL) {
-        inputDirecory = ".";
-    }
-
-    char ** csvPaths;
-    int numCsv;
-
-    if (findCsvFiles(inputDirecory, &csvPaths, &numCsv)) {
-        
-        int fd[2];
-        pipe(fd);
-        pid_t * children = multiFork(numCsv);
-        pid_t * pids = (pid_t *) pipeDataToChildren(children, sizeof(pid_t) * numCsv,
-                                                    fd, children != NULL, numCsv);
-        
-        if (children == NULL){
-            
-            for (int i = 0; i < numCsv; i++) {
-                
-                if (getpid() == pids[i]) {
-                    
-                    
-                }
-            }
-            
-        } else {
-            
-            for (int i = 0; i < numCsv; i++) {
-                wait(NULL);
-            }
-        }
-
-    } else {
-
-        fprintf(stderr, "Specified directory not found: %s\n", inputDirecory);
-        exit(EXIT_FAILURE);
-    }
-
-    exit(EXIT_SUCCESS);
-}
+//int main3(int argc, char ** argv) {
+//
+//    char * columnHeader = getColumnHeader(argc, argv);
+//    char * inputDirecory = getInputDirectory(argc, argv);
+//
+//    if (inputDirecory == NULL) {
+//        inputDirecory = ".";
+//    }
+//
+//    char ** csvPaths;
+//    int numCsv;
+//
+//    if (findCsvFiles(inputDirecory, &csvPaths, &numCsv)) {
+//        
+//        int fd[2];
+//        pipe(fd);
+//        pid_t * children = multiFork(numCsv);
+//        pid_t * pids = (pid_t *) pipeDataToChildren(children, sizeof(pid_t) * numCsv,
+//                                                    fd, children != NULL, numCsv);
+//        
+//        if (children == NULL){
+//            
+//            for (int i = 0; i < numCsv; i++) {
+//                
+//                if (getpid() == pids[i]) {
+//                    
+//                    
+//                }
+//            }
+//            
+//        } else {
+//            
+//            for (int i = 0; i < numCsv; i++) {
+//                wait(NULL);
+//            }
+//        }
+//
+//    } else {
+//
+//        fprintf(stderr, "Specified directory not found: %s\n", inputDirecory);
+//        exit(EXIT_FAILURE);
+//    }
+//
+//    exit(EXIT_SUCCESS);
+//}
 
 //int main2(int argc, char ** argv) {
 //

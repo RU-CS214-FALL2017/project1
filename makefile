@@ -4,3 +4,6 @@ allFiles = $(sourceFiles) $(dir)/analyser.h $(dir)/sorter.h $(dir)/tools.h $(dir
 
 sorter: $(allFiles)
 	gcc -std=gnu11 $(sourceFiles) -o sorter -Wall
+
+debug: $(allFiles)
+	gcc -g -std=gnu11 $(sourceFiles) -o sorter -Wall
