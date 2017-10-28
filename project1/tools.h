@@ -13,7 +13,7 @@ struct csvDir {
     char * path;
     
     pid_t * subChildPids;
-    struct csvDir * subDirs;
+    struct csvDir ** subDirs;
     unsigned int * numSubDirs;
     
     pid_t * csvChildPids;

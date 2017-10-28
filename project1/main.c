@@ -19,11 +19,12 @@ int main() {
     struct csvDir * info;
     processCsvDir(".", &info, NULL, NULL);
     
-    if (getpid() == parent){
+//    if (getpid() == parent){
     
+        sleep(5);
         printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
         
-    }
+//    }
 
     exit(EXIT_SUCCESS);
 }

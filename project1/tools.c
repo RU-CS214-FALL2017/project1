@@ -221,13 +221,13 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
     
     (*info) = (struct csvDir *) myMap(sizeof(struct csvDir));
     
-    (*info) ->pid = myMap(sizeof(pid_t));
+    (*info)->pid = myMap(sizeof(pid_t));
     *((*info)->pid) = getpid();
     (*info)->path = myMap(strlen(path));
     strcpy((*info)->path, path);
     
     (*info)->subChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
-    (*info)->subDirs = (struct csvDir *) myMap(sizeof(struct csvDir) * TEMPSIZE);
+    (*info)->subDirs = (struct csvDir **) myMap(sizeof(struct csvDir *) * TEMPSIZE);
     (*info)->numSubDirs = myMap(sizeof(unsigned int));
     *((*info)->numSubDirs) = 0;
     
@@ -246,10 +246,11 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
                 
                 char subDirPath[TEMPSIZE];
                 sprintf(subDirPath, "%s/%s", path, entry->d_name);
-            
-                struct csvDir * subInfo = &(((*info)->subDirs)[*((*info)->numSubDirs)]);
-                processCsvDir(subDirPath, &subInfo, columnHeader, outputDir);
+
+                processCsvDir(subDirPath, &(((*info)->subDirs)[*((*info)->numSubDirs)]), columnHeader, outputDir);
                 (*((*info)->numSubDirs))++;
+                
+                return 1;
             }
             
         } else if (entry->d_type == DT_REG) {
@@ -274,6 +275,8 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
 //                        sortCsv(csvPath, columnHeader, outputDir);
 //                    }
                 }
+                
+                return 1;
             }
         }
     }
