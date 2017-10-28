@@ -509,6 +509,8 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
             }
             
             printf("error unmapping: %s\n", err);
+        } else {
+            printf("unmap good\n");
         }
         
         return NULL;
