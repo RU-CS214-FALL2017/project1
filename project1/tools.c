@@ -285,7 +285,9 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
             (*((*info)->numCsvPaths))++;
         }
     }
-    printf("test: %lu", sizeof(pid_t) * *((*info)->numSubDirs));
+    
+    printf("test: %lu\n", sizeof(pid_t) * *((*info)->numSubDirs));
+    
     (*info)->subChildPids = (pid_t *) myReMap((*info)->subChildPids, sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
     (*info)->subDirs = (struct csvDir **) myReMap((*info)->subDirs, sizeof(struct csvDir *) * TEMPSIZE, sizeof(struct csvDir *) * *((*info)->numSubDirs));
 
