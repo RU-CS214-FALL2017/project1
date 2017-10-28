@@ -491,7 +491,24 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
     if (remap == MAP_FAILED) {
         
-        printf("error remapping: %d\n", errno);
+        char * err = "fuck you";
+        
+        switch (errno) {
+            case EAGAIN:
+                err = "again";
+                break;
+            case EFAULT:
+                err = "fault";
+                break;
+            case EINVAL:
+                err = "inval";
+                break;
+            case ENOMEM:
+                err = "nomem";
+                break;
+        }
+        
+        printf("error remapping: %s\n", err);
         return address;
     }
     
