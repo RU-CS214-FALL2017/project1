@@ -21,7 +21,7 @@ int main() {
     
     if (getpid() == parent){
         
-        printf("%d %d\n", info->numSubDirs, info->numSubDirs);
+        printf("%u %u\n", *(info->numSubDirs), *(info->numSubDirs));
         
     }
     
