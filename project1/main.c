@@ -19,12 +19,15 @@ int main() {
     struct csvDir * info;
     processCsvDir(".", &info, NULL, NULL);
     
-//    if (getpid() == parent){
+    if (getpid() == parent){
+        
+        for (int i = 0; i < (*(info->numSubDirs) + *(info->numCsvPaths)); i++) {
+            wait(NULL);
+        }
     
-        sleep(5);
         printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
         
-//    }
+    }
 
     exit(EXIT_SUCCESS);
 }
