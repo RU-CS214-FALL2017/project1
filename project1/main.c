@@ -20,11 +20,11 @@ int main() {
     processCsvDir(".", &info, NULL, NULL);
     
     if (getpid() == parent){
-        
-        printf("%u %u\n", *(info->numSubDirs), *(info->numSubDirs));
+    
+        printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
         
     }
-    
+
     exit(EXIT_SUCCESS);
 }
 
