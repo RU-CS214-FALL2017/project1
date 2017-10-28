@@ -15,19 +15,25 @@
 #include "mainTools.h"
 
 int main() {
+
+//    int two = 2;
+//    int * fun = &two;
+//    int four = 2 * *fun;
+//
+//    printf("%d\n", four);
     
     pid_t parent = getpid();
     struct csvDir * info;
     processCsvDir(".", &info, NULL, NULL);
-    
+
     if (getpid() == parent){
-        
+
         for (int i = 0; i < (*(info->numSubDirs) + *(info->numCsvPaths)); i++) {
             wait(NULL);
         }
-    
+
         printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
-        
+
     }
 
     exit(EXIT_SUCCESS);
