@@ -15,12 +15,6 @@
 #include "mainTools.h"
 
 int main() {
-
-//    int two = 2;
-//    int * fun = &two;
-//    int four = 2 * *fun;
-//
-//    printf("%d\n", four);
     
     pid_t parent = getpid();
     struct csvDir * info;
