@@ -489,7 +489,28 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
     
     if (newSize == 0) {
         
-        munmap(address, oldSize);
+        if (munmap(address, oldSize) == -1) {
+            
+            char * err = "fuck you";
+            
+            switch (errno) {
+                case EAGAIN:
+                    err = "again";
+                    break;
+                case EFAULT:
+                    err = "fault";
+                    break;
+                case EINVAL:
+                    err = "inval";
+                    break;
+                case ENOMEM:
+                    err = "nomem";
+                    break;
+            }
+            
+            printf("error unmapping: %s\n", err);
+        }
+        
         return NULL;
         
     } else {
