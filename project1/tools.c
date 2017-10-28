@@ -1,4 +1,5 @@
 #define _GNU_SOURCE 1
+
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -7,6 +8,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/wait.h>
 
 #include "tools.h"
 #include "sorter.h"
