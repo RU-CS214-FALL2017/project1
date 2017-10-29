@@ -13,6 +13,7 @@
 #include "sorter.h"
 #include "analyser.h"
 #include "mainTools.h"
+#include "forkTools.h"
 
 int main() {
     

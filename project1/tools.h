@@ -29,13 +29,8 @@ void printTable (FILE * stream, char *** table, unsigned int rows, unsigned int 
 int isNumber(const char * str);
 int isXBeforeY (const char * x, const char * y, int areNumbers);
 int isNumericColumn(char *** table, int rows, int columnIndex);
-int processCsvDir(const char * path, struct csvDir * * info, const char * columnHeader, const char * outputDir);
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
-pid_t * multiFork(int num);
-void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2], int isParent, int numChildren);
-void * myMap(size_t size);
-void * myReMap(void * address, size_t oldSize, size_t newSize);
 
 #endif /* tools_h */
