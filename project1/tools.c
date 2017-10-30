@@ -307,8 +307,8 @@ unsigned int lineageParser(const char * path, char * ** lineage) {
 // | INCOMPLETE! |
 // ---------------
 // If the name of the CSV file located at <path> is A. This function returns
-// the newly allocated string: "A-sorted-<columnHeader>.csv". To free, free
-// the returned pointer.
+// the newly allocated string: "<outputDir>/A-sorted-<columnHeader>.csv". To
+// free, free the returned pointer.
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir) {
     return NULL;
 }
