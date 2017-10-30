@@ -14,22 +14,21 @@
 #include "analyser.h"
 #include "mainTools.h"
 #include "forkTools.h"
+#include "memTools.h"
 
 int main() {
     
-    pid_t parent = getpid();
+    pid_t initial = getpid();
+//    unsigned int * processCount = (unsigned int *) myMap(sizeof(unsigned int));
+    
+    printf("Initial PID: %d\n", initial);
+    printf("PIDS of all child processes: ");
+    fflush(stdout);
+    
     struct csvDir * info;
     processCsvDir(".", &info, NULL, NULL);
-
-    if (getpid() == parent){
-
-        for (int i = 0; i < (*(info->numSubDirs) + *(info->numCsvPaths)); i++) {
-            wait(NULL);
-        }
-
-        printf("%u %u\n", *(info->numSubDirs), *(info->numCsvPaths));
-
-    }
+    
+    printf("\nTotal number of processes: %d\n", 1 + *(info->numSubDirs) + *(info->numCsvPaths));
 
     exit(EXIT_SUCCESS);
 }
