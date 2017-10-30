@@ -3,7 +3,7 @@
 
 #include "tools.h"
 #include "sorter.h"
-#include "free.h"
+#include "memTools.h"
 
 // Sorts a the CSV file at <csvPath> in ascending order
 // on the column header <columnHeader>. Saves the sorted
