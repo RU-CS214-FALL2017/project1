@@ -8,6 +8,9 @@
 void merge(char *** table, const unsigned int columnIndex, const int areNumbers,
            const unsigned int start, const unsigned int mid,  const unsigned int end);
 
+void cascadeSort(char *** table, unsigned int rows, unsigned int start,
+                 const unsigned int end, const int * headers, const unsigned int numHeaders);
+
 // Sorts a the CSV file at <csvPath> in ascending order
 // on the column header <columnHeader>. Saves the sorted
 // csv file in <outputDir>.
@@ -22,55 +25,82 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     fillTable(csv, &table, &rows, &columns);
     fclose(csv);
     
-    if (sortByHeader(columnHeader, table, rows, columns)) {
+    sortByHeaders(csvPath, columnHeader, table, rows, columns);
         
-        char * outputCsvPath = sortedCsvPath(csvPath, columnHeader, outputDir);
-        FILE * sortedCsv = fopen(outputCsvPath, "w");
-        free(outputCsvPath);
-        
-        printTable(sortedCsv, table, rows, columns);
-        fclose(sortedCsv);
-        
-    } else {
-        
-        fprintf(stderr, "Specified column header, %s, not found in %s\n", columnHeader, csvPath);
-        exit(EXIT_FAILURE);
-    }
+    char * outputCsvPath = sortedCsvPath(csvPath, columnHeader, outputDir);
+    FILE * sortedCsv = fopen(outputCsvPath, "w");
+    free(outputCsvPath);
+    
+    printTable(sortedCsv, table, rows, columns);
+    fclose(sortedCsv);
     
     tripleFree(table, rows, columns);
 }
 
 // Ascendingly sorts <table> with <rows> rows and <columns> columns according to
-// the column with the header <columnHeader>. Returns 1 if <columnHeader>
-// was found, else returns 0.
-int sortByHeader(const char * columnHeader, char *** table,
+// the column with the first header in <columnHeaders>. Cascades the sort on the
+// other headers in <columnHeaders> in order. <columnHeaders> should be a
+// comma-delimited list of headers. Returns 1 if the first header in <columnHeaders>
+// was found, else returns 0. Prints errors for cascaded headers not found.
+void sortByHeaders(const char * csvPath, const char * columnHeaders, char *** table,
                       const unsigned int rows, const unsigned int columns) {
     
-    unsigned int columnIndex = 0;
-    int found = 0;
+    char ** headers;
+    unsigned int numHeaders = tokenizeRow(columnHeaders, &headers);
     
-    for (int i = 0; i < columns; i++) {
+    int column = getColumnHeaderIndex(headers[0], table, columns);
+    if (column == -1) {
         
-        if (!strcmp((table)[0][i], columnHeader)) {
+        fprintf(stderr, "Specified column header, %s, not found in %s\n", headers[0], csvPath);
+        exit(EXIT_FAILURE);
+    }
+    
+    mergeSort(table, column, isNumericColumn(table, rows, column), 1, rows);
+    
+    int foundHeaders[numHeaders];
+    foundHeaders[0] = column;
+    int fhi = 1;
+    
+    for (int i = 1; i < numHeaders; i++) {
+        
+        foundHeaders[fhi] = getColumnHeaderIndex(headers[i], table, columns);
+        
+        if (foundHeaders[fhi] == -1) {
             
-            columnIndex = i;
-            found = 1;
-            break;
+            fprintf(stderr, "Cannot cascade sort %s by specified column header, %s, because it was not found\n",
+                    csvPath, headers[i]);
+            
+        } else {
+            fhi++;
         }
     }
     
-    if (found) {
+    cascadeSort(table, rows, 1, rows, foundHeaders, fhi);
+}
+
+// Cascades the sort of table with <rows> rows according to headers
+// with indexes <headers>. <headers>[0] is the index of the header
+// that <table> is sorted by from <start> to and not including <end>.
+// <numHeaders is the number of elements in <headers>.
+void cascadeSort(char *** table, unsigned int rows, unsigned int start,
+                 const unsigned int end, const int * headers, const unsigned int numHeaders) {
+    
+    if (numHeaders > 1) {
         
-        mergeSort(table, columnIndex, isNumericColumn(table, rows, columnIndex), 1, rows);
-        return found;
-        
-    } else {
-        return found;
+        for (unsigned int j = start; j < end; j++) {
+            
+            if (strcmp(table[start][headers[0]], table[j][headers[0]])) {
+                
+                mergeSort(table, headers[1], isNumericColumn(table, rows, headers[1]), start, j);
+                cascadeSort(table, rows, start, j, &headers[1], numHeaders - 1);
+                start = j;
+            }
+        }
     }
 }
 
 // Ascendingly sorts <table> according to the column at index <columnIndex> from row at
-// index <start> to row at index <end>. If areNumbers is set to 0, the sort
+// index <start> to row at index <end> - 1. If areNumbers is set to 0, the sort
 // is done numerically otherwise it is done lexicographically.
 void mergeSort(char *** table, const unsigned int columnIndex, const int areNumbers,
                const unsigned int start, const unsigned int end) {

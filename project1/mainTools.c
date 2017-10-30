@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "mainTools.h"
 
@@ -17,7 +17,7 @@ char * getColumnHeader(int argc, char ** argv) {
     
     if (columnHeader == NULL) {
         
-        perror("Column header not specified\nUse -h for help");
+        fprintf(stderr, "Column header not specified\nUse -h for help\n");
         exit(EXIT_FAILURE);
         
     } else {
