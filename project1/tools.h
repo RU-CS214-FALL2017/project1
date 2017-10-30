@@ -17,6 +17,6 @@ int isNumericColumn(char *** table, int rows, int columnIndex);
 int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
-char * sortedCsvName(const char * csvPath, const char * columnHeader);
+char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir);
 
 #endif /* tools_h */
