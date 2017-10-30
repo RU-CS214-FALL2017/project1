@@ -42,25 +42,28 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
         
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
             
-            ((*info)->subChildPids)[*((*info)->numSubDirs)] = fork();
+            pid_t child = fork();
             
-            if (((*info)->subChildPids)[*((*info)->numSubDirs)] == 0) {
+            if (child == 0) {
                 
                 char subDirPath[TEMPSIZE];
                 sprintf(subDirPath, "%s/%s", path, entry->d_name);
                 
                 processCsvDir(subDirPath, &(((*info)->subDirs)[*((*info)->numSubDirs)]), columnHeader, outputDir);
                 
-                return 1;
+                exit(EXIT_SUCCESS);
             }
             
+            ((*info)->subChildPids)[*((*info)->numSubDirs)] = child;
             (*((*info)->numSubDirs))++;
+            printf("%d,", child);
+            fflush(stdout);
             
         } else if (entry->d_type == DT_REG) {
             
-            ((*info)->csvChildPids)[*((*info)->numCsvPaths)] = fork();
+            pid_t child = fork();
             
-            if (((*info)->csvChildPids)[*((*info)->numCsvPaths)] == 0) {
+            if (child == 0) {
                 
                 char csvPath[TEMPSIZE];
                 sprintf(csvPath, "%s/%s", path, entry->d_name);
@@ -78,10 +81,13 @@ int processCsvDir(const char * path, struct csvDir * * info, const char * column
                     //                    }
                 }
                 
-                return 1;
+                exit(EXIT_SUCCESS);
             }
             
+            ((*info)->csvChildPids)[*((*info)->numCsvPaths)] = child;
             (*((*info)->numCsvPaths))++;
+            printf("%d,", child);
+            fflush(stdout);
         }
     }
     
