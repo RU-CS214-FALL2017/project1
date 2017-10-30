@@ -6,21 +6,6 @@
 
 #define TEMPSIZE 4096
 
-// Represents a processed directory.
-struct csvDir {
-    
-    pid_t * pid;
-    char * path;
-    
-    pid_t * subChildPids;
-    struct csvDir ** subDirs;
-    unsigned int * numSubDirs;
-    
-    pid_t * csvChildPids;
-    char ** csvPaths;
-    unsigned int * numCsvPaths;
-};
-
 unsigned int tokenizeRow(const char * line, char * ** row);
 void trim (char * str);
 void removeChars (char * str, unsigned long startIndex, unsigned long endIndex);
