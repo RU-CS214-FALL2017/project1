@@ -20,13 +20,16 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     unsigned int columns;
     
     fillTable(csv, &table, &rows, &columns);
+    fclose(csv);
     
     if (sortByHeader(columnHeader, table, rows, columns)) {
         
         char * outputCsvPath = sortedCsvPath(csvPath, columnHeader, outputDir);
         FILE * sortedCsv = fopen(outputCsvPath, "w");
         free(outputCsvPath);
+        
         printTable(sortedCsv, table, rows, columns);
+        fclose(sortedCsv);
         
     } else {
         
