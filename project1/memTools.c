@@ -3,6 +3,24 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#include "forkTools.h"
+
+// ---------------
+// | INCOMPLETE! |
+// ---------------
+// Frees <alloc>[i] (0 <= i < <x>) and <alloc>.
+void doubleFree(char ** alloc, int x) {
+    
+}
+
+// ---------------
+// | INCOMPLETE! |
+// ---------------
+// Frees <alloc>[i][j] (0 <= i < <x>, 0 <= j < <y>) and <alloc>.
+void tripleFree(char *** alloc, int x, int y) {
+    
+}
+
 // Allocates <size> bytes of memory shared between processes
 // and returns a pointer to the allocated memory.
 void * myMap(size_t size) {
@@ -26,16 +44,7 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
 // ---------------
 // | INCOMPLETE! |
 // ---------------
-// Frees <alloc>[i] (0 <= i < <x>) and <alloc>.
-void doubleFree(char ** alloc, int x) {
-    
-}
-
-// ---------------
-// | INCOMPLETE! |
-// ---------------
-// Frees <alloc>[i][j] (0 <= i < <x>, 0 <= j < <y>) and <alloc>.
-void tripleFree(char *** alloc, int x, int y) {
-    
+int unMapCsvDir(struct csvDir * dir) {
+    return 0;
 }
 
