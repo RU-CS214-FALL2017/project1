@@ -18,5 +18,6 @@ int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir);
+int getColumnHeaderIndex(const char * columnHeader, char *** table, unsigned int columns);
 
 #endif /* tools_h */

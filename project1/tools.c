@@ -310,7 +310,24 @@ unsigned int lineageParser(const char * path, char * ** lineage) {
 // the newly allocated string: "<outputDir>/A-sorted-<columnHeader>.csv". To
 // free, free the returned pointer.
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir) {
-    return NULL;
+    
+    char * ret = (char * ) malloc(strlen(outputDir) + 7);
+    sprintf(ret, "%s/s.csv", outputDir);
+    return ret;
+}
+
+// Returns the index of <columnHeader> in <table> with <columns>
+// columns. If <columnHeader> not found, return -1.
+int getColumnHeaderIndex(const char * columnHeader, char *** table, unsigned int columns) {
+    
+    for (int i = 0; i < columns; i++) {
+        
+        if (!strcmp(columnHeader, table[0][i])) {
+            return i;
+        }
+    }
+    
+    return -1;
 }
 
 
