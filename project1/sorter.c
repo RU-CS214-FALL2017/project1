@@ -23,15 +23,9 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     
     if (sortByHeader(columnHeader, table, rows, columns)) {
         
-        char ** csvLineage;
-        unsigned int lineageNum = lineageParser(csvPath, &csvLineage);
-        
-        char sortedCsvPath[strlen(csvLineage[0]) + strlen(outputDir) + 1];
-        sprintf(sortedCsvPath, "%s/%s", outputDir, csvLineage[0]);
-        
-        doubleFree(csvLineage, lineageNum);
-        
-        FILE * sortedCsv = fopen(sortedCsvPath, "w");
+        char * outputCsvPath = sortedCsvPath(csvPath, columnHeader, outputDir);
+        FILE * sortedCsv = fopen(outputCsvPath, "w");
+        free(outputCsvPath);
         printTable(sortedCsv, table, rows, columns);
         
     } else {
