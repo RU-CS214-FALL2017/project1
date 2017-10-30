@@ -33,7 +33,7 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
         
     } else {
         
-        fprintf(stderr, "Specified column header, %s, not found in %s", columnHeader, csvPath);
+        fprintf(stderr, "Specified column header, %s, not found in %s\n", columnHeader, csvPath);
         exit(EXIT_FAILURE);
     }
     
