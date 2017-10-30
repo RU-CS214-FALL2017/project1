@@ -5,6 +5,9 @@
 #include "sorter.h"
 #include "memTools.h"
 
+void merge(char *** table, const unsigned int columnIndex, const int areNumbers,
+           const unsigned int start, const unsigned int mid,  const unsigned int end);
+
 // Sorts a the CSV file at <csvPath> in ascending order
 // on the column header <columnHeader>. Saves the sorted
 // csv file in <outputDir>.
@@ -39,9 +42,6 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     
     tripleFree(table, rows, columns);
 }
-
-void merge(char *** table, const unsigned int columnIndex, const int areNumbers,
-           const unsigned int start, const unsigned int mid,  const unsigned int end);
 
 // Ascendingly sorts <table> with <rows> rows and <columns> columns according to
 // the column with the header <columnHeader>. Returns 1 if <columnHeader>
