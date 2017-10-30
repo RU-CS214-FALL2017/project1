@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include "forkTools.h"
 #include "tools.h"
 #include "memTools.h"
 
