@@ -23,5 +23,6 @@ char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char
 int getColumnHeaderIndex(const char * columnHeader,
                          char *** table, const unsigned int columns);
 void printDirTree(FILE * output, struct csvDir dir);
+void checkDir(const char * path, const char * dirType);
 
 #endif /* tools_h */

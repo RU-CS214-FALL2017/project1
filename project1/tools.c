@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <errno.h>
 
 #include "tools.h"
 #include "forkTools.h"
@@ -334,7 +335,7 @@ char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char
     
     tempTok[strlen(tempTok) - 4] = '\0';
     
-    char * ret = (char * ) malloc(strlen(outputDir) + strlen(tempTok) + strlen(columnHeader) + 9 + TEMPSIZE);
+    char * ret = (char * ) malloc(strlen(outputDir) + strlen(tempTok) + strlen(columnHeader) + 14);
     sprintf(ret, "%s/%s-sorted-%s.csv", outputDir, tempTok, columnHeader);
     
     return ret;
@@ -385,5 +386,37 @@ void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level) {
     }
 }
 
+void checkDir(const char * path, const char * dirType) {
 
+    DIR * dir = opendir(path);
+    
+    if (dir == NULL) {
+        
+        errno = 0;
+        
+        switch (errno) {
+                
+            case EACCES:
+                printf("You do not have access to the specified %s directory, %s\n", dirType, path);
+                break;
+                
+            case ENOENT:
+                printf("The specified %s directory, %s, does not exist\n", dirType, path);
+                break;
+                
+            case ENOTDIR:
+                printf("The specified %s directory, %s, is not a directory\n", dirType, path);
+                break;
+                
+            default:
+                printf("A problem occured opening the specified %s directory, %s", dirType, path);
+                break;
+        }
+        
+        closedir(dir);
+        exit(EXIT_FAILURE);
+    }
+    
+    closedir(dir);
+}
 

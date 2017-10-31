@@ -18,54 +18,32 @@
 
 int main8(int argc, char ** argv) {
     
-    printf("%d\n", isProperCsv("something.cs"));
     return 0;
 }
-
-int main2() {
-    
-    pid_t initial = getpid();
-//    unsigned int * processCount = (unsigned int *) myMap(sizeof(unsigned int));
-    
-    printf("Initial PID: %d\n", initial);
-    printf("PIDS of all child processes: ");
-    fflush(stdout);
-    
-    struct csvDir info;
-    processCsvDir(".", &info, NULL, NULL);
-    
-    printf("\nTotal number of processes: %d\n", 1 + info.numSubDirs + info.numCsvs);
-    
-//    printDirTree(stdout, info);
-
-    exit(EXIT_SUCCESS);
-}
-
-
-
-
-
-
-
 
 int main(int argc, char ** argv) {
 
     char * columnHeaders = getColumnHeader(argc, argv);
     char * inputDirecory = getInputDirectory(argc, argv);
-
+    
     if (inputDirecory == NULL) {
         inputDirecory = ".";
+    }
+    
+    checkDir(inputDirecory, "input");
+    
+    char * outputDirectory = getOutputDirectory(argc, argv);
+    if (outputDirectory != NULL) {
+        checkDir(outputDirectory, "output");
     }
     
     printf("Initial PID: %d\n", getpid());
     printf("PIDS of all child processes: ");
     fflush(stdout);
-    
-    char * outputDirectory = getOutputDirectory(argc, argv);
 
     processCsvDir(inputDirecory, NULL, columnHeaders, outputDirectory);
     
-    printf("\noutput dir: %s\n", outputDirectory);
+    printf("\n");
 
     exit(EXIT_SUCCESS);
 }
