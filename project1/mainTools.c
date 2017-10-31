@@ -17,7 +17,7 @@ char * getColumnHeader(int argc, char ** argv) {
     
     if (columnHeader == NULL) {
         
-        fprintf(stderr, "Column header not specified\nUse -h for help\n");
+        fprintf(stderr, "Column header not specified\n");
         exit(EXIT_FAILURE);
         
     } else {
