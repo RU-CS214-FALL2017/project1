@@ -16,14 +16,13 @@
 #include "forkTools.h"
 #include "memTools.h"
 
-int main2(int argc, char ** argv) {
+int main8(int argc, char ** argv) {
     
-    char * columnHeader = getColumnHeader(argc, argv);
-    sortCsv("movie_metadata.csv", columnHeader, ".");
-    exit(EXIT_SUCCESS);
+    printf("%d\n", isProperCsv("something.cs"));
+    return 0;
 }
 
-int main() {
+int main2() {
     
     pid_t initial = getpid();
 //    unsigned int * processCount = (unsigned int *) myMap(sizeof(unsigned int));
@@ -32,12 +31,12 @@ int main() {
     printf("PIDS of all child processes: ");
     fflush(stdout);
     
-    struct csvDir * info;
+    struct csvDir info;
     processCsvDir(".", &info, NULL, NULL);
     
-    printf("\nTotal number of processes: %d\n", 1 + *(info->numSubDirs) + *(info->numCsvPaths));
+    printf("\nTotal number of processes: %d\n", 1 + info.numSubDirs + info.numCsvs);
     
-    printDirTree(stdout, info);
+//    printDirTree(stdout, info);
 
     exit(EXIT_SUCCESS);
 }
@@ -49,51 +48,27 @@ int main() {
 
 
 
-//int main3(int argc, char ** argv) {
-//
-//    char * columnHeader = getColumnHeader(argc, argv);
-//    char * inputDirecory = getInputDirectory(argc, argv);
-//
-//    if (inputDirecory == NULL) {
-//        inputDirecory = ".";
-//    }
-//
-//    char ** csvPaths;
-//    int numCsv;
-//
-//    if (findCsvFiles(inputDirecory, &csvPaths, &numCsv)) {
-//        
-//        int fd[2];
-//        pipe(fd);
-//        pid_t * children = multiFork(numCsv);
-//        pid_t * pids = (pid_t *) pipeDataToChildren(children, sizeof(pid_t) * numCsv,
-//                                                    fd, children != NULL, numCsv);
-//        
-//        if (children == NULL){
-//            
-//            for (int i = 0; i < numCsv; i++) {
-//                
-//                if (getpid() == pids[i]) {
-//                    
-//                    
-//                }
-//            }
-//            
-//        } else {
-//            
-//            for (int i = 0; i < numCsv; i++) {
-//                wait(NULL);
-//            }
-//        }
-//
-//    } else {
-//
-//        fprintf(stderr, "Specified directory not found: %s\n", inputDirecory);
-//        exit(EXIT_FAILURE);
-//    }
-//
-//    exit(EXIT_SUCCESS);
-//}
+int main(int argc, char ** argv) {
+
+    char * columnHeaders = getColumnHeader(argc, argv);
+    char * inputDirecory = getInputDirectory(argc, argv);
+
+    if (inputDirecory == NULL) {
+        inputDirecory = ".";
+    }
+    
+    printf("Initial PID: %d\n", getpid());
+    printf("PIDS of all child processes: ");
+    fflush(stdout);
+    
+    char * outputDirectory = getOutputDirectory(argc, argv);
+
+    processCsvDir(inputDirecory, NULL, columnHeaders, outputDirectory);
+    
+    printf("\noutput dir: %s\n", outputDirectory);
+
+    exit(EXIT_SUCCESS);
+}
 
 //int main2(int argc, char ** argv) {
 //

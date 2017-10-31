@@ -2,8 +2,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <string.h>
 
 #include "forkTools.h"
+#include "memTools.h"
 
 // ---------------
 // | INCOMPLETE! |
@@ -47,4 +49,37 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
 int unMapCsvDir(struct csvDir * dir) {
     return 0;
 }
+
+//void * initSharedMem(size_t size) {
+//    
+//    void * mem = myMap(size);
+//    struct metadata * header = META_PTR_CAST mem;
+//    struct metadata * footer = META_PTR_CAST ((CHAR_PTR_CAST mem) + size - META_SIZE);
+//    
+//    header->size = size;
+//    header->dirty = 0;
+//    memcpy(footer, header, META_SIZE);
+//    
+//    return mem;
+//}
+//
+//void * myalloc(size_t size, void * mem, size_t memSize) {
+//    
+//    char * alloc = CHAR_PTR_CAST mem;
+//    
+//    while(alloc < (CHAR_PTR_CAST mem) + memSize) {
+//        
+//        if (!(META_PTR_CAST alloc)->dirty && (META_PTR_CAST alloc)->size <= size) {
+//            
+//            (META_PTR_CAST alloc)->dirty = 1;
+//            (META_PTR_CAST alloc)->size = size;
+//            struct metadata * footer = META_PTR_CAST (alloc + size + META_SIZE);
+//            struct metadata * nextHeader = footer + 1;
+//            struct metadata * nextFooter = META_PTR_CAST ((CHAR_PTR_CAST nextHeader))
+//            
+//        }
+//        
+//        alloc += ((META_PTR_CAST alloc)->size + (META_SIZE * 2));
+//    }
+//}
 

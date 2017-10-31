@@ -22,6 +22,6 @@ unsigned int lineageParser(const char * path, char * ** lineage);
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir);
 int getColumnHeaderIndex(const char * columnHeader,
                          char *** table, const unsigned int columns);
-void printDirTree(FILE * output, struct csvDir * dir);
+void printDirTree(FILE * output, struct csvDir dir);
 
 #endif /* tools_h */

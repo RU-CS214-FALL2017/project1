@@ -14,7 +14,7 @@ void cascadeSort(char *** table, unsigned int rows, unsigned int start,
 // Sorts a the CSV file at <csvPath> in ascending order
 // on the column header <columnHeader>. Saves the sorted
 // csv file in <outputDir>.
-void sortCsv(const char * csvPath, const char * columnHeader, const char * outputDir) {
+void sortCsv(const char * csvPath, const char * columnHeaders, const char * outputDir) {
     
     FILE * csv = fopen(csvPath, "r");
     
@@ -25,9 +25,9 @@ void sortCsv(const char * csvPath, const char * columnHeader, const char * outpu
     fillTable(csv, &table, &rows, &columns);
     fclose(csv);
     
-    sortByHeaders(csvPath, columnHeader, table, rows, columns);
+    sortByHeaders(csvPath, columnHeaders, table, rows, columns);
         
-    char * outputCsvPath = sortedCsvPath(csvPath, columnHeader, outputDir);
+    char * outputCsvPath = sortedCsvPath(csvPath, columnHeaders, outputDir);
     FILE * sortedCsv = fopen(outputCsvPath, "w");
     free(outputCsvPath);
     

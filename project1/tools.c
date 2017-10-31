@@ -7,7 +7,7 @@
 #include "forkTools.h"
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
-void printDirTreeHelper(FILE * output, struct csvDir * dir, unsigned int level);
+void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level);
 
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
@@ -288,7 +288,14 @@ int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
 // ---------------
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
 int isProperCsv(const char * csvPath) {
-    return 1;
+    
+    const char * extension = csvPath + strlen(csvPath) - 4;
+    
+    if (!strcmp(".csv", extension)) {
+        return 1;
+    }
+    
+    return 0;
 }
 
 // ---------------
@@ -313,8 +320,23 @@ unsigned int lineageParser(const char * path, char * ** lineage) {
 // free, free the returned pointer.
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir) {
     
-    char * ret = (char * ) malloc(strlen(outputDir) + 7);
-    sprintf(ret, "%s/s.csv", outputDir);
+    char temp[strlen(csvPath) + 1];
+    strcpy(temp, csvPath);
+    
+    char * token = strtok(temp, "/");
+    char * tempTok = NULL;
+    
+    while (token != NULL) {
+        
+        tempTok = token;
+        token = strtok(NULL, "/");
+    }
+    
+    tempTok[strlen(tempTok) - 4] = '\0';
+    
+    char * ret = (char * ) malloc(strlen(outputDir) + strlen(tempTok) + strlen(columnHeader) + 9 + TEMPSIZE);
+    sprintf(ret, "%s/%s-sorted-%s.csv", outputDir, tempTok, columnHeader);
+    
     return ret;
 }
 
@@ -333,11 +355,11 @@ int getColumnHeaderIndex(const char * columnHeader,
     return -1;
 }
 
-void printDirTree(FILE * output, struct csvDir * dir) {
+void printDirTree(FILE * output, struct csvDir dir) {
     printDirTreeHelper(output, dir, 0);
 }
 
-void printDirTreeHelper(FILE * output, struct csvDir * dir, unsigned int level) {
+void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level) {
     
     char * begin = "|   ";
     char * end = "| - ";
@@ -346,20 +368,20 @@ void printDirTreeHelper(FILE * output, struct csvDir * dir, unsigned int level) 
         fprintf(output, "%s", begin);
     }
     
-    fprintf(output, "%s%d: Processed the directory %s\n", end, *(dir->pid), (dir->path));
+    fprintf(output, "%s%d: Processed the directory %s\n", end, dir.pid, dir.path);
     
-    for (int i = 0; i < *(dir->numCsvPaths); i++) {
+    for (int i = 0; i < dir.numCsvs; i++) {
         
         for (int i = 0; i < (level + 1); i++){
             fprintf(output, "%s", begin);
         }
         
         fprintf(output, "%s%d: Sorted the file %s\n", end,
-                dir->csvChildPids[i], dir->csvPaths[i]);
+                dir.csvs[i].pid, dir.csvs[i].path);
     }
     
-    for (int i = 0; i < *(dir->numSubDirs); i++) {
-        printDirTreeHelper(output, dir->subDirs[i], level + 1);
+    for (int i = 0; i < dir.numSubDirs; i++) {
+        printDirTreeHelper(output, dir.subDirs[i], level + 1);
     }
 }
 

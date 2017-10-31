@@ -7,6 +7,7 @@
 #include "forkTools.h"
 #include "tools.h"
 #include "memTools.h"
+#include "sorter.h"
 
 // Sorts all CSV files by the column header <columnHeader> in the
 // directory and subdirectories located at <path>. The sorted CSV
@@ -14,8 +15,8 @@
 // refrence will be set to point to newly mapped memory of info
 // about the processed directory. To free, unmap all members of
 // *(*<info>) and all members of subDirs within *(*<info>).
-int processCsvDir(const char * path, struct csvDir * * info,
-                  const char * columnHeader, const char * outputDir) {
+int processCsvDir(const char * path, struct csvDir * info,
+                  const char * columnHeaders, const char * outputDir) {
     
     DIR * dir = opendir(path);
     
@@ -23,22 +24,8 @@ int processCsvDir(const char * path, struct csvDir * * info,
         return 0;
     }
     
-    (*info) = (struct csvDir *) myMap(sizeof(struct csvDir));
-    
-    (*info)->pid = myMap(sizeof(pid_t));
-    *((*info)->pid) = getpid();
-    (*info)->path = myMap(strlen(path));
-    strcpy((*info)->path, path);
-    
-    (*info)->subChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
-    (*info)->subDirs = (struct csvDir **) myMap(sizeof(struct csvDir *) * TEMPSIZE);
-    (*info)->numSubDirs = myMap(sizeof(unsigned int));
-    *((*info)->numSubDirs) = 0;
-    
-    (*info)->csvChildPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
-    (*info)->csvPaths = (char **) myMap(sizeof(char *) * TEMPSIZE);
-    (*info)->numCsvPaths = myMap(sizeof(unsigned int));
-    *((*info)->numCsvPaths) = 0;
+    unsigned int numSubDirs = 0;
+    unsigned int numCsvs = 0;
     
     for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
         
@@ -50,14 +37,12 @@ int processCsvDir(const char * path, struct csvDir * * info,
                 
                 char subDirPath[TEMPSIZE];
                 sprintf(subDirPath, "%s/%s", path, entry->d_name);
-                
-                processCsvDir(subDirPath, &(((*info)->subDirs)[*((*info)->numSubDirs)]), columnHeader, outputDir);
+                processCsvDir(subDirPath, NULL, columnHeaders, outputDir);
                 
                 exit(EXIT_SUCCESS);
             }
             
-            ((*info)->subChildPids)[*((*info)->numSubDirs)] = child;
-            (*((*info)->numSubDirs))++;
+            numSubDirs++;
             printf("%d,", child);
             fflush(stdout);
             
@@ -71,39 +56,25 @@ int processCsvDir(const char * path, struct csvDir * * info,
                 sprintf(csvPath, "%s/%s", path, entry->d_name);
                 
                 if (isProperCsv(csvPath)) {
-                    
-                    ((*info)->csvPaths)[*((*info)->numCsvPaths)] = myMap(strlen(csvPath) + 1);
-                    strcpy(((*info)->csvPaths)[*((*info)->numCsvPaths)], csvPath);
-                    
-                    //                    if (outputDir == NULL) {
-                    //                        sortCsv(csvPath, columnHeader, path);
-                    //
-                    //                    } else {
-                    //                        sortCsv(csvPath, columnHeader, outputDir);
-                    //                    }
+
+                    if (outputDir == NULL) {
+                        sortCsv(csvPath, columnHeaders, path);
+                        
+                    } else {
+                        sortCsv(csvPath, columnHeaders, outputDir);
+                    }
                 }
                 
                 exit(EXIT_SUCCESS);
             }
             
-            ((*info)->csvChildPids)[*((*info)->numCsvPaths)] = child;
-            (*((*info)->numCsvPaths))++;
+            numCsvs++;
             printf("%d,", child);
             fflush(stdout);
         }
     }
     
-    (*info)->subChildPids = (pid_t *) myReMap((*info)->subChildPids,
-                                              sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numSubDirs));
-    (*info)->subDirs = (struct csvDir **) myReMap((*info)->subDirs,
-                                                  sizeof(struct csvDir *) * TEMPSIZE, sizeof(struct csvDir *) * *((*info)->numSubDirs));
-    
-    (*info)->csvChildPids = (pid_t *) myReMap((*info)->csvChildPids,
-                                              sizeof(pid_t) * TEMPSIZE, sizeof(pid_t) * *((*info)->numCsvPaths));
-    (*info)->csvPaths = (char **) myReMap((*info)->csvPaths,
-                                          sizeof(char *) * TEMPSIZE, sizeof(char *) * *((*info)->numCsvPaths));
-    
-    for (int i = 0; i < (*((*info)->numSubDirs) + *((*info)->numCsvPaths)); i++) {
+    for (int i = 0; i < numSubDirs + numCsvs; i++) {
         wait(NULL);
     }
     
