@@ -4,8 +4,10 @@
 #include <dirent.h>
 
 #include "tools.h"
+#include "forkTools.h"
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
+void printDirTreeHelper(FILE * output, struct csvDir * dir, unsigned int level);
 
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
@@ -318,7 +320,8 @@ char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char
 
 // Returns the index of <columnHeader> in <table> with <columns>
 // columns. If <columnHeader> not found, return -1.
-int getColumnHeaderIndex(const char * columnHeader, char *** table, const unsigned int columns) {
+int getColumnHeaderIndex(const char * columnHeader,
+                         char *** table, const unsigned int columns) {
     
     for (int i = 0; i < columns; i++) {
         
@@ -328,6 +331,36 @@ int getColumnHeaderIndex(const char * columnHeader, char *** table, const unsign
     }
     
     return -1;
+}
+
+void printDirTree(FILE * output, struct csvDir * dir) {
+    printDirTreeHelper(output, dir, 0);
+}
+
+void printDirTreeHelper(FILE * output, struct csvDir * dir, unsigned int level) {
+    
+    char * begin = "|   ";
+    char * end = "| - ";
+    
+    for (int i = 0; i < level; i++){
+        fprintf(output, "%s", begin);
+    }
+    
+    fprintf(output, "%s%d: Processed the directory %s\n", end, *(dir->pid), (dir->path));
+    
+    for (int i = 0; i < *(dir->numCsvPaths); i++) {
+        
+        for (int i = 0; i < (level + 1); i++){
+            fprintf(output, "%s", begin);
+        }
+        
+        fprintf(output, "%s%d: Sorted the file %s\n", end,
+                dir->csvChildPids[i], dir->csvPaths[i]);
+    }
+    
+    for (int i = 0; i < *(dir->numSubDirs); i++) {
+        printDirTreeHelper(output, dir->subDirs[i], level + 1);
+    }
 }
 
 

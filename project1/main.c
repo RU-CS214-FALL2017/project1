@@ -16,14 +16,14 @@
 #include "forkTools.h"
 #include "memTools.h"
 
-int main(int argc, char ** argv) {
+int main2(int argc, char ** argv) {
     
     char * columnHeader = getColumnHeader(argc, argv);
     sortCsv("movie_metadata.csv", columnHeader, ".");
     exit(EXIT_SUCCESS);
 }
 
-int main4() {
+int main() {
     
     pid_t initial = getpid();
 //    unsigned int * processCount = (unsigned int *) myMap(sizeof(unsigned int));
@@ -36,6 +36,8 @@ int main4() {
     processCsvDir(".", &info, NULL, NULL);
     
     printf("\nTotal number of processes: %d\n", 1 + *(info->numSubDirs) + *(info->numCsvPaths));
+    
+    printDirTree(stdout, info);
 
     exit(EXIT_SUCCESS);
 }

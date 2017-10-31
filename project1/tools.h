@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
+#include "forkTools.h"
+
 #define TEMPSIZE 4096
 
 unsigned int tokenizeRow(const char * line, char * ** row);
@@ -18,6 +20,8 @@ int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound);
 int isProperCsv(const char * csvPath);
 unsigned int lineageParser(const char * path, char * ** lineage);
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir);
-int getColumnHeaderIndex(const char * columnHeader, char *** table, const unsigned int columns);
+int getColumnHeaderIndex(const char * columnHeader,
+                         char *** table, const unsigned int columns);
+void printDirTree(FILE * output, struct csvDir * dir);
 
 #endif /* tools_h */

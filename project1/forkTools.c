@@ -14,7 +14,8 @@
 // refrence will be set to point to newly mapped memory of info
 // about the processed directory. To free, unmap all members of
 // *(*<info>) and all members of subDirs within *(*<info>).
-int processCsvDir(const char * path, struct csvDir * * info, const char * columnHeader, const char * outputDir) {
+int processCsvDir(const char * path, struct csvDir * * info,
+                  const char * columnHeader, const char * outputDir) {
     
     DIR * dir = opendir(path);
     

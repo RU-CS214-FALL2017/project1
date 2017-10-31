@@ -37,8 +37,8 @@ void * myReMap(void * address, size_t oldSize, size_t newSize) {
         munmap(address, oldSize);
         return NULL;
     }
-    
-    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
+    return address;
+//    return mremap(address, oldSize, newSize, MREMAP_MAYMOVE);
 }
 
 // ---------------
