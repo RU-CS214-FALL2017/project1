@@ -16,8 +16,8 @@
 #include "forkTools.h"
 #include "memTools.h"
 
-int main8(int argc, char ** argv) {
-    
+int main5(int argc, char ** argv) {
+    printf("%lu\n", sizeof(struct csvDir));
     return 0;
 }
 
@@ -25,25 +25,29 @@ int main(int argc, char ** argv) {
 
     char * columnHeaders = getColumnHeader(argc, argv);
     char * inputDirecory = getInputDirectory(argc, argv);
-    
+
     if (inputDirecory == NULL) {
         inputDirecory = ".";
     }
-    
+
     checkDir(inputDirecory, "input");
-    
+
     char * outputDirectory = getOutputDirectory(argc, argv);
     if (outputDirectory != NULL) {
         checkDir(outputDirectory, "output");
     }
-    
+
     printf("Initial PID: %d\n", getpid());
     printf("PIDS of all child processes: ");
     fflush(stdout);
 
-    processCsvDir(inputDirecory, NULL, columnHeaders, outputDirectory);
+    void * sharedMem = initSharedMem(getpid());
+    void * dirMem = initDirMem();
     
+    processCsvDir(inputDirecory, sharedMem, dirMem, columnHeaders, outputDirectory);
+
     printf("\n");
+    printDirTree(stdout, dirMem);
 
     exit(EXIT_SUCCESS);
 }

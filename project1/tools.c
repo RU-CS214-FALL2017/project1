@@ -3,12 +3,15 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "tools.h"
 #include "forkTools.h"
+#include "memTools.h"
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
-void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level);
+void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int level);
 
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
@@ -356,11 +359,13 @@ int getColumnHeaderIndex(const char * columnHeader,
     return -1;
 }
 
-void printDirTree(FILE * output, struct csvDir dir) {
-    printDirTreeHelper(output, dir, 0);
+void printDirTree(FILE * output, void * dirMem) {
+    printDirTreeHelper(output, getpid(),dirMem, 0);
 }
 
-void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level) {
+void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int level) {
+    
+    struct csvDir * dir = getDirFromPid(dirMem, pid);
     
     char * begin = "|   ";
     char * end = "| - ";
@@ -369,20 +374,20 @@ void printDirTreeHelper(FILE * output, struct csvDir dir, unsigned int level) {
         fprintf(output, "%s", begin);
     }
     
-    fprintf(output, "%s%d: Processed the directory %s\n", end, dir.pid, dir.path);
+    fprintf(output, "%s%d: Processed the directory %s\n", end, dir->pid, dir->path);
     
-    for (int i = 0; i < dir.numCsvs; i++) {
+    for (int i = 0; i < dir->numCsvs; i++) {
         
         for (int i = 0; i < (level + 1); i++){
             fprintf(output, "%s", begin);
         }
         
         fprintf(output, "%s%d: Sorted the file %s\n", end,
-                dir.csvs[i].pid, dir.csvs[i].path);
+                dir->csvs[i].pid, dir->csvs[i].path);
     }
     
-    for (int i = 0; i < dir.numSubDirs; i++) {
-        printDirTreeHelper(output, dir.subDirs[i], level + 1);
+    for (int i = 0; i < dir->numSubDirs; i++) {
+        printDirTreeHelper(output, (dir->subDirsPids)[i], dirMem, level + 1);
     }
 }
 

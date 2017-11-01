@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 
 #include "forkTools.h"
 #include "tools.h"
@@ -15,7 +16,7 @@
 // refrence will be set to point to newly mapped memory of info
 // about the processed directory. To free, unmap all members of
 // *(*<info>) and all members of subDirs within *(*<info>).
-int processCsvDir(const char * path, struct csvDir * info,
+int processCsvDir(const char * path, void * sharedMem, void * dirMem,
                   const char * columnHeaders, const char * outputDir) {
     
     DIR * dir = opendir(path);
@@ -24,57 +25,78 @@ int processCsvDir(const char * path, struct csvDir * info,
         return 0;
     }
     
-    unsigned int numSubDirs = 0;
-    unsigned int numCsvs = 0;
+    struct csvDir * info = getDirFromPid(dirMem, getpid());
+    info->pid = getpid();
+    info->path = (char *) myalloc(strlen(path) + 1, sharedMem);
+    strcpy(info->path, path);
+    
+    pid_t * tempDirPids = (pid_t *) myMap(sizeof(pid_t) * TEMPSIZE);
+    info->numSubDirs = 0;
+    
+    struct csv * tempCsvs = (struct csv *) myMap(sizeof(struct csv) * TEMPSIZE);
+    info->numCsvs = 0;
     
     for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
         
         if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            
+
             pid_t child = fork();
             
             if (child == 0) {
                 
                 char subDirPath[TEMPSIZE];
                 sprintf(subDirPath, "%s/%s", path, entry->d_name);
-                processCsvDir(subDirPath, NULL, columnHeaders, outputDir);
+                processCsvDir(subDirPath, sharedMem, dirMem, columnHeaders, outputDir);
                 
                 exit(EXIT_SUCCESS);
             }
-            
-            numSubDirs++;
+
+            tempDirPids[info->numSubDirs] = child;
+            (info->numSubDirs)++;
             printf("%d,", child);
             fflush(stdout);
             
         } else if (entry->d_type == DT_REG) {
             
-            pid_t child = fork();
+            char csvPath[TEMPSIZE];
+            sprintf(csvPath, "%s/%s", path, entry->d_name);
             
-            if (child == 0) {
+            if (isProperCsv(csvPath)) {
                 
-                char csvPath[TEMPSIZE];
-                sprintf(csvPath, "%s/%s", path, entry->d_name);
+                pid_t child = fork();
                 
-                if (isProperCsv(csvPath)) {
-
+                if (child == 0) {
+                    
                     if (outputDir == NULL) {
                         sortCsv(csvPath, columnHeaders, path);
                         
                     } else {
                         sortCsv(csvPath, columnHeaders, outputDir);
                     }
+                    
+                    exit(EXIT_SUCCESS);
                 }
                 
-                exit(EXIT_SUCCESS);
+                tempCsvs[info->numCsvs].path = (char *) myalloc(strlen(csvPath) + 1, sharedMem);
+                strcpy(tempCsvs[info->numCsvs].path, csvPath);
+                tempCsvs[info->numCsvs].pid = child;
+                
+                (info->numCsvs)++;
+                printf("%d,", child);
+                fflush(stdout);
             }
-            
-            numCsvs++;
-            printf("%d,", child);
-            fflush(stdout);
         }
     }
     
-    for (int i = 0; i < numSubDirs + numCsvs; i++) {
+    info->subDirsPids = (pid_t *) myalloc(sizeof(pid_t) * info->numSubDirs, sharedMem);
+    memcpy(info->subDirsPids, tempDirPids, sizeof(pid_t) * info->numSubDirs);
+    munmap(tempDirPids, sizeof(pid_t) * TEMPSIZE);
+    
+    info->csvs = (struct csv *) myalloc(sizeof(struct csv) * info->numCsvs, sharedMem);
+    memcpy(info->csvs, tempCsvs, sizeof(struct csv) * info->numCsvs);
+    munmap(tempCsvs, sizeof(struct csv) * TEMPSIZE);
+    
+    for (int i = 0; i < info->numSubDirs + info->numCsvs; i++) {
         wait(NULL);
     }
     

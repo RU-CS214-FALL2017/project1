@@ -6,8 +6,6 @@
 
 #include "forkTools.h"
 
-#define TEMPSIZE 4096
-
 unsigned int tokenizeRow(const char * line, char * ** row);
 void trim (char * str);
 void removeChars (char * str, unsigned long startIndex, unsigned long endIndex);
@@ -22,7 +20,7 @@ unsigned int lineageParser(const char * path, char * ** lineage);
 char * sortedCsvPath(const char * csvPath, const char * columnHeader, const char * outputDir);
 int getColumnHeaderIndex(const char * columnHeader,
                          char *** table, const unsigned int columns);
-void printDirTree(FILE * output, struct csvDir dir);
+void printDirTree(FILE * output, void * dirMem);
 void checkDir(const char * path, const char * dirType);
 
 #endif /* tools_h */
