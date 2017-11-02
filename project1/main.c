@@ -40,7 +40,15 @@ int main(int argc, char ** argv) {
     processCsvDir(inputDirecory, sharedMem, columnHeaders, outputDirectory);
 
     printf("\nTotal number of processes: %u\n\n", dirSubProcessCount(getpid(), sharedMem));
+    
     printDirTree(stdout, sharedMem);
+    FILE * output = fopen("structure.txt", "w");
+    printDirTree(output, sharedMem);
+    fclose(output);
+    
+    printf("\nAlso saved the structure to structure.txt\n");
+    
+    freeSharedMem(sharedMem);
 
     exit(EXIT_SUCCESS);
 }
