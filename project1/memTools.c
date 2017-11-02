@@ -13,8 +13,10 @@
 #define VOID_PTR_CAST (void *)
 #define PID_PTR_CAST (pid_t *)
 #define DIR_PTR_CAST (struct csvDir *)
+#define SHARED_MEM_PTR_CAST (struct sharedMem *)
 
-void * getMyMem(void * sharedMem);
+void * initMemHelper(size_t size);
+void * getMySharedSeg(struct sharedMem * sharedMem);
 void initMetadata(void * memSeg, size_t size);
 
 // Frees <alloc>[i] (0 <= i < <x>) and <alloc>.
@@ -32,7 +34,7 @@ void tripleFree(char *** alloc, int x, int y) {
     
     for (int i = 0; i < x; i++) {
         
-        for (int j = 0; j < y; y++) {
+        for (int j = 0; j < y; j++) {
             free(alloc[i][j]);
         }
         
@@ -52,14 +54,17 @@ void * myMap(size_t size) {
 // Initializes and returns shared memory that can be used
 // with myalloc. To free, unmap the returned pointer with
 // size SHARED_MEM_SIZE.
-void * initSharedMem() {
+struct sharedMem * initSharedMem() {
     
-    void * ret = myMap(SHARED_MEM_SIZE);
-    *(PID_PTR_CAST ret) = getpid();
+    struct sharedMem * ret = myMap(SHARED_MEM_SIZE);
     
-    char * seg = (CHAR_PTR_CAST ret) + sizeof(pid_t);
+    ret->pid = getpid();
+    ret->csvMem = myMap(CSV_MEM_SIZE);
+    ret->dirMem = myMap(DIR_MEM_SIZE);
     
-    while (seg < (CHAR_PTR_CAST ret) + (SHARED_MEM_SIZE - sizeof(pid_t))) {
+    char * seg = (CHAR_PTR_CAST ret) + sizeof(struct sharedMem);
+    
+    while (seg < (CHAR_PTR_CAST ret) + (SHARED_MEM_SIZE - sizeof(struct sharedMem))) {
         
         initMetadata(VOID_PTR_CAST seg, TEMPSIZE);
         seg += TEMPSIZE;
@@ -68,35 +73,34 @@ void * initSharedMem() {
     return ret;
 }
 
-// Initializes and returns memory to store struct csvDir,
-// which can than be retrieved with getDirFromPid, To free,
-// unmap the returned value of size DIR_MEM_SIZE.
-void * initDirMem(){
+void freeSharedMem(struct sharedMem * sharedMem) {
     
-    void * ret = myMap(DIR_MEM_SIZE);
-    *(PID_PTR_CAST ret) = getpid();
-    
-    return ret;
+    munmap(sharedMem->dirMem, DIR_MEM_SIZE);
+    munmap(sharedMem->csvMem, CSV_MEM_SIZE);
+    munmap(sharedMem, SHARED_MEM_SIZE);
 }
 
-// Retrieves the info saved by the process <pid> from <dirMem>
-// of the dir.
-struct csvDir * getDirFromPid(void * dirMem, pid_t pid) {
+// Retrieves the info of the directory process <pid> from <dirMem>.
+struct csvDir * getDirSeg(struct sharedMem * sharedMem, pid_t pid) {
     
-    pid_t index = pid - *(PID_PTR_CAST dirMem);
-    char * ret = CHAR_PTR_CAST dirMem;
-    ret += sizeof(pid_t) + (index * sizeof(struct csvDir));
-    return (struct csvDir *) ret;
+    pid_t index = pid - sharedMem->pid;
+    return ((struct csvDir *) sharedMem->dirMem) + index;
+}
+
+// Retrieves the info of the csv process <pid> from <csvMem>.
+struct csv * getCsvSeg(struct sharedMem * sharedMem, pid_t pid) {
+    
+    pid_t index = pid - sharedMem->pid;
+    return ((struct csv *) sharedMem->csvMem) + index;
 }
 
 // Retrieves the segregated memory of the current pid
 // in <sharedMem>.
-void * getMyMem(void * sharedMem) {
+void * getMySharedSeg(struct sharedMem * sharedMem) {
     
-    pid_t index = getpid() - *(PID_PTR_CAST sharedMem);
-    char * ret = CHAR_PTR_CAST sharedMem;
-    ret += sizeof(pid_t) + (index * TEMPSIZE);
-    return VOID_PTR_CAST ret;
+    pid_t index = getpid() - sharedMem->pid;
+    char * ret = CHAR_PTR_CAST (sharedMem + 1);
+    return VOID_PTR_CAST (ret + (TEMPSIZE * index));
 }
 
 // Adds clean metadata to <memSeg> of <size>.
@@ -109,9 +113,9 @@ void initMetadata(void * memSeg, size_t size) {
 }
 
 // Returns allocated memory of <size> from sharedMem of the current pid.
-void * myalloc(size_t size, void * sharedMem) {
+void * myalloc(size_t size, struct sharedMem * sharedMem) {
 
-    void * mem = getMyMem(sharedMem);
+    void * mem = getMySharedSeg(sharedMem);
     char * alloc = CHAR_PTR_CAST mem;
 
     while(alloc < (CHAR_PTR_CAST mem) + TEMPSIZE) {

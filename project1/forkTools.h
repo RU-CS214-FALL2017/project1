@@ -3,28 +3,28 @@
 
 #define TEMPSIZE 4096
 
+#include "memTools.h"
+
 // Represents a sorted CSV file.
 struct csv {
     
-    pid_t pid;
     char * path;
+    char * errors;
+    char sorted;
+    char error;
 };
 
 // Represents a processed directory.
 struct csvDir {
     
-    pid_t pid;
     char * path;
     pid_t * subDirsPids;
-    struct csv * csvs;
+    pid_t * csvPids;
     unsigned int numSubDirs;
     unsigned int numCsvs;
 };
 
-int processCsvDir(const char * path, void * sharedMem, void * dirMem,
-                  const char * columnHeaders, const char * outputDir);
-pid_t * multiFork(int num);
-void * pipeDataToChildren(const void * source, size_t size, int pipedFd[2], int isParent, int numChildren);
-void * pipeDataToParent(const void * source, size_t size, int pipedFd[2], int isChild);
+void processCsvDir(const char * path, struct sharedMem * sharedMem,
+                   const char * columnHeaders, const char * outputDir);
 
 #endif /* forkTools_h */

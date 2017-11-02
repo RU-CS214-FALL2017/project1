@@ -11,7 +11,7 @@
 #include "memTools.h"
 
 int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound);
-void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int level);
+void printDirTreeHelper(FILE * output, pid_t pid, struct sharedMem * sharedMem, unsigned int level);
 
 // <row> is the address to a char **. Creates a array of strings
 // A, where each comma seperated value from <line> is an element
@@ -20,7 +20,9 @@ void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int le
 // (0 <= i < # of elements in A) and free *<row>.
 unsigned int tokenizeRow(const char * line, char * ** row) {
     
-    *row = (char **) malloc(strlen(line) * sizeof(char *));
+    if (row != NULL) {
+         *row = (char **) malloc(strlen(line) * sizeof(char *));
+    }
     
     char tempChar = '\0';
     char tempCell[TEMPSIZE];
@@ -37,8 +39,10 @@ unsigned int tokenizeRow(const char * line, char * ** row) {
             
             tempCell[j] = '\0';
             trim(tempCell);
-            (*row)[i] = (char *) malloc(strlen(tempCell) * sizeof(char) + 1);
-            strcpy((*row)[i], tempCell);
+            if (row != NULL) {
+                (*row)[i] = (char *) malloc(strlen(tempCell) * sizeof(char) + 1);
+                strcpy((*row)[i], tempCell);
+            }
             
             j = 0;
             i += 1;
@@ -113,7 +117,7 @@ void removeChars (char * str, unsigned long startIndex, unsigned long endIndex) 
 // *<table>.
 void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned int * columns) {
     
-    *table = (char ***) malloc(4194304 * sizeof(char **));
+    *table = (char ***) malloc(TEMPSIZE * TEMPSIZE * sizeof(char **));
     char line[TEMPSIZE];
     *rows = 0;
     *columns = 0;
@@ -131,12 +135,7 @@ void fillTable(FILE * csvFile, char * *** table, unsigned int * rows, unsigned i
             (*rows)++;
             
         } else {
-            
-            for (int j = 0; j < tempColumns; j++) {
-                free((*table)[*rows][j]);
-            }
-            
-            free((*table)[*rows]);
+            doubleFree((*table)[*rows], tempColumns);
         }
     }
     
@@ -210,88 +209,8 @@ int isNumericColumn(char *** table, int rows, int columnIndex) {
     return 1;
 }
 
-// Finds all "propper" .csv files in the path <dirPath> and all subdirectories.
-// <foundCsv>'s refrence will point to a newly allocated array of strings with
-// paths to all "proper" .csv files found. <numFound>'s refrence will be set to
-// the number of "proper" .csv files found. Returns 1 if the directory at <dirPath>
-// is found, and 0 otherwise. To free, free all (*<csvPaths>)[i] (0 <= i < *<numFound>)
-// and free *<csvPaths>.
-int findCsvFiles(const char * dirPath, char * ** csvPaths, int * numFound) {
-
-    (*csvPaths) = (char **) malloc(sizeof(char *) * TEMPSIZE);
-    (*numFound) = 0;
-    
-    if (findCsvFilesHelper(dirPath, *csvPaths, numFound)) {
-        
-        (*csvPaths) = (char **) realloc(*csvPaths, sizeof(char *) * (*numFound));
-        return 1;
-        
-    } else {
-        
-        free(*csvPaths);
-        return 0;
-    }
-}
-
-// This is a recursive helper function. Finds all "propper" .csv files in the
-// path <dirPath> and all subdirectories thorugh recursive calling. <csvPaths>
-// is a pre-allocated array of (char *)'s. <numFound>'s refrence keeps track
-// of the current index of <csvPaths>. Returns 1 if the directory at <dirPath>
-// is found, and 0 otherwise or if any of the recursive calls return a 0.
-int findCsvFilesHelper(const char * dirPath, char ** csvPaths, int * numFound) {
-    
-    DIR * dir = opendir(dirPath);
-    
-    if (dir == NULL) {
-        return 0;
-    }
-    
-    char subDirPaths[255][TEMPSIZE];
-    int sdp = 0; // Pointer for <subdirectories>.
-    
-    for (struct dirent * entry = readdir(dir); entry != NULL; entry = readdir(dir)) {
-        
-        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            
-            sprintf(subDirPaths[sdp], "%s/%s", dirPath, entry->d_name);
-            sdp++;
-            
-        } else if (entry->d_type == DT_REG) {
-            
-            char csvPath[TEMPSIZE];
-            sprintf(csvPath, "%s/%s", dirPath, entry->d_name);
-            
-            if (isProperCsv(csvPath)) {
-                
-                csvPaths[*numFound] = (char *) malloc((sizeof(char) * strlen(csvPath)) + 1);
-                strcpy(csvPaths[*numFound], csvPath);
-                (*numFound)++;
-            }
-        }
-    }
-    
-    closedir(dir);
-    
-    for (int i = 0; i < sdp; i++) {
-        
-        if (!findCsvFilesHelper(subDirPaths[i], csvPaths, numFound)) {
-            
-            for (int i = 0; i < (*numFound); i++) {
-                free(csvPaths[*numFound]);
-            }
-            
-            return 0;
-        }
-    }
-    
-    return 1;
-}
-
-// ---------------
-// | INCOMPLETE! |
-// ---------------
 // Returns 1 if <csvPath> is a path to a "proper" .csv file, else returns 0.
-int isProperCsv(const char * csvPath) {
+int isCsv(const char * csvPath) {
     
     const char * extension = csvPath + strlen(csvPath) - 4;
     
@@ -302,23 +221,6 @@ int isProperCsv(const char * csvPath) {
     return 0;
 }
 
-// ---------------
-// | INCOMPLETE! |
-// ---------------
-// <path> is a path to a file or directory. This function should point
-// <lineage>'s refrence to a newly allocated array of (char *), let's
-// call it arr, such that arr[0] is the name of the file or directory
-// pointed to by <path> and arr[n] where n > 0 is the parent directory
-// of arr[n-1] for all n where 0 < n < return value. This function returns
-// the number of elements in arr. To free, free (*<lineage>)[i] (0 <= i <
-// returned value) and free *<lineage>.
-unsigned int lineageParser(const char * path, char * ** lineage) {
-    return 0;
-}
-
-// ---------------
-// | INCOMPLETE! |
-// ---------------
 // If the name of the CSV file located at <path> is A. This function returns
 // the newly allocated string: "<outputDir>/A-sorted-<columnHeader>.csv". To
 // free, free the returned pointer.
@@ -359,22 +261,22 @@ int getColumnHeaderIndex(const char * columnHeader,
     return -1;
 }
 
-void printDirTree(FILE * output, void * dirMem) {
-    printDirTreeHelper(output, getpid(),dirMem, 0);
+void printDirTree(FILE * output, struct sharedMem * sharedMem) {
+    printDirTreeHelper(output, getpid(), sharedMem, 0);
 }
 
-void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int level) {
+void printDirTreeHelper(FILE * output, pid_t pid, struct sharedMem * sharedMem, unsigned int level) {
     
-    struct csvDir * dir = getDirFromPid(dirMem, pid);
+    struct csvDir * dir = getDirSeg(sharedMem, pid);
     
-    char * begin = "|   ";
-    char * end = "| - ";
+    char * begin = "| ";
+    char * end = "|-";
     
     for (int i = 0; i < level; i++){
         fprintf(output, "%s", begin);
     }
     
-    fprintf(output, "%s%d: Processed the directory %s\n", end, dir->pid, dir->path);
+    fprintf(output, "%s%d: Processed the directory %s\n", end, pid, dir->path);
     
     for (int i = 0; i < dir->numCsvs; i++) {
         
@@ -382,15 +284,44 @@ void printDirTreeHelper(FILE * output, pid_t pid, void * dirMem, unsigned int le
             fprintf(output, "%s", begin);
         }
         
-        fprintf(output, "%s%d: Sorted the file %s\n", end,
-                dir->csvs[i].pid, dir->csvs[i].path);
+        struct csv * csv = getCsvSeg(sharedMem, dir->csvPids[i]);
+        
+        if(csv->sorted) {
+            
+            fprintf(output, "%s%d: Sorted the file %s", end, (dir->csvPids)[i], csv->path);
+            
+            if (csv->error) {
+                fprintf(output, " (%s)", csv->errors);
+            }
+            
+            fprintf(output, "\n");
+            
+        } else {
+            
+            fprintf(output, "%s%d: Tried to sort the file %s (%s)\n", end, (dir->csvPids)[i], csv->path, csv->errors);
+        }
     }
     
     for (int i = 0; i < dir->numSubDirs; i++) {
-        printDirTreeHelper(output, (dir->subDirsPids)[i], dirMem, level + 1);
+        printDirTreeHelper(output, (dir->subDirsPids)[i], sharedMem, level + 1);
     }
 }
 
+unsigned int dirSubProcessCount(pid_t dirPid, struct sharedMem * sharedMem) {
+    
+    struct csvDir * dir = getDirSeg(sharedMem, dirPid);
+    
+    unsigned int count = 1 + dir->numCsvs;
+    
+    for (int i = 0; i < dir->numSubDirs; i++) {
+        count += dirSubProcessCount((dir->subDirsPids)[i], sharedMem);
+    }
+    
+    return count;
+}
+
+// Checks weather <path> is a valid directory, if not,
+// the program crashes with an approiate error message.
 void checkDir(const char * path, const char * dirType) {
 
     DIR * dir = opendir(path);
