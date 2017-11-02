@@ -22,7 +22,9 @@ Design
 
 Extra Credit
 ------------
+
 ###Cascading
 This was very simple to implement. I jsut recursivly used the functions I already made to cascade sort a smaller area of the CSV file.
+
 ###Printing Structure
 This was kind of dificult. I created a memory management system for mapped memory. I created an algorithm that gives each PID a segregated memory so there are no clashing read/writes.
